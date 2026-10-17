@@ -42,15 +42,20 @@ professional advice.
 
 **Claude Code: as a plugin from GitHub**
 ```
-/plugin marketplace add OWNER/REPO
+/plugin marketplace add magnetomohit-jpg/ca-agent-skill
 /plugin install ca-agent@ca-agent-skills
 ```
 
-**Claude Code: as a personal skill**: copy `skills/ca-agent` into `~/.claude/skills/` (all projects) or
-into `<project>/.claude/skills/` (one project).
+**Claude Code: as a personal skill**
+```
+git clone https://github.com/magnetomohit-jpg/ca-agent-skill.git
+```
+Then copy `ca-agent-skill/skills/ca-agent` into `~/.claude/skills/` (all projects) or into
+`<project>/.claude/skills/` (one project).
 
-**Claude.ai / Claude desktop:** zip the `skills/ca-agent` folder (or use `dist/ca-agent.skill`) and upload
-it under *Settings → Capabilities → Skills*.
+**Claude.ai / Claude desktop:** download
+[`dist/ca-agent.skill`](https://github.com/magnetomohit-jpg/ca-agent-skill/raw/main/dist/ca-agent.skill)
+(or zip the `skills/ca-agent` folder) and upload it under *Settings → Capabilities → Skills*.
 
 The scripts need Python 3.10+. `openpyxl` is optional (Excel output).
 
