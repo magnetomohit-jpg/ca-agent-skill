@@ -89,6 +89,11 @@ INDIVIDUAL = {
     },
 }
 
+# HRA exemption, rule 2A: least of HRA received, rent less 10% of salary, and 50% (metro) / 40% of salary,
+# where salary = basic + DA forming part of retirement benefits (+ turnover commission).
+HRA_METRO_CITIES = {"2025-26": ["Delhi", "Mumbai", "Kolkata", "Chennai"]}  # later years: verify the rules under the 2025 Act
+HRA_METRO_PCT, HRA_OTHER_PCT, HRA_RENT_EXCESS_PCT = 0.50, 0.40, 0.10
+
 # Surcharge for individuals/HUF/AOP: (income above, rate). Capped at 15% on 111A/112A/112/dividend income.
 SURCHARGE_INDIVIDUAL = [(5000000, 0.10), (10000000, 0.15), (20000000, 0.25), (50000000, 0.37)]
 SURCHARGE_SPECIAL_INCOME_CAP = 0.15

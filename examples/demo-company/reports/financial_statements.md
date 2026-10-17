@@ -8,14 +8,14 @@ CIN: U51909MH2019PTC123456 | PAN: AAKCS1234F | GSTIN: 27AAKCS1234F1ZI | Financia
 | **I. EQUITY AND LIABILITIES** |  |  |  |
 | (1) Shareholders' funds |  |  |  |
 | &nbsp;&nbsp;Share capital | 2 | 10,00,000.00 | 10,00,000.00 |
-| &nbsp;&nbsp;Reserves and surplus | 3 | 10,57,446.34 | 3,43,129.00 |
+| &nbsp;&nbsp;Reserves and surplus | 3 | 10,57,445.34 | 3,43,129.00 |
 | (3) Non-current liabilities |  |  |  |
 | &nbsp;&nbsp;Long-term borrowings | 4 | 5,00,000.00 | 5,00,000.00 |
 | &nbsp;&nbsp;Deferred tax liabilities (net) | 5 | 0.00 | 6,871.00 |
 | (4) Current liabilities |  |  |  |
 | &nbsp;&nbsp;Trade payables - total outstanding dues of micro and small enterprises | 6 | 3,54,000.00 | 2,00,000.00 |
 | &nbsp;&nbsp;Other current liabilities | 7 | 1,66,400.00 | 0.00 |
-| &nbsp;&nbsp;Short-term provisions | 8 | 2,60,119.00 | 0.00 |
+| &nbsp;&nbsp;Short-term provisions | 8 | 2,60,120.00 | 0.00 |
 | **TOTAL** |  | **33,37,965.34** | **20,50,000.00** |
 | **II. ASSETS** |  |  |  |
 | (1) Non-current assets |  |  |  |
@@ -46,9 +46,9 @@ CIN: U51909MH2019PTC123456 | PAN: AAKCS1234F | GSTIN: 27AAKCS1234F1ZI | Financia
 | V. Profit before exceptional items and tax (III - IV) |  | 9,59,269.95 |  |
 | VI. Exceptional items |  | 0.00 |  |
 | **VII. Profit before tax (V - VI)** |  | 9,59,269.95 |  |
-| VIII. Tax expense: (1) Current tax |  | 2,60,119.00 |  |
+| VIII. Tax expense: (1) Current tax |  | 2,60,120.00 |  |
 | &nbsp;&nbsp;(2) Deferred tax |  | (15,166.39) |  |
-| **IX. Profit/(loss) for the year (VII - VIII)** |  | 7,14,317.34 |  |
+| **IX. Profit/(loss) for the year (VII - VIII)** |  | 7,14,316.34 |  |
 | X. Earnings per equity share (face value Rs 10): basic and diluted |  | 7.14 |  |
 
 ## Cash Flow Statement for the year ended 31-03-2026 (indirect method, AS 3)
@@ -97,8 +97,8 @@ CIN: U51909MH2019PTC123456 | PAN: AAKCS1234F | GSTIN: 27AAKCS1234F1ZI | Financia
 | Particulars | 31-03-2026 | 31-03-2025 |
 | --- | ---: | ---: |
 | Surplus in Statement of Profit and Loss | 3,43,129.00 | 3,43,129.00 |
-| Profit/(loss) for the year | 7,14,317.34 | 0.00 |
-| **Total** | 10,57,446.34 | 3,43,129.00 |
+| Profit/(loss) for the year | 7,14,316.34 | 0.00 |
+| **Total** | 10,57,445.34 | 3,43,129.00 |
 
 **Note 4 - Long-term borrowings**
 
@@ -136,8 +136,8 @@ CIN: U51909MH2019PTC123456 | PAN: AAKCS1234F | GSTIN: 27AAKCS1234F1ZI | Financia
 
 | Particulars | 31-03-2026 | 31-03-2025 |
 | --- | ---: | ---: |
-| Provision for Income Tax | 2,60,119.00 |  |
-| **Total** | 2,60,119.00 | 0.00 |
+| Provision for Income Tax | 2,60,120.00 |  |
+| **Total** | 2,60,120.00 | 0.00 |
 
 **Note 9 - Property, plant and equipment**
 
@@ -153,7 +153,7 @@ CIN: U51909MH2019PTC123456 | PAN: AAKCS1234F | GSTIN: 27AAKCS1234F1ZI | Financia
 
 | Particulars | 31-03-2026 | 31-03-2025 |
 | --- | ---: | ---: |
-| Deferred Tax Liability (Net) | 8,295.39 |  |
+| Deferred Tax Liability (Net) (debit balance, shown as a deferred tax asset) | 8,295.39 |  |
 | **Total** | 8,295.39 | 0.00 |
 
 **Note 11 - Long-term loans and advances**
@@ -250,6 +250,46 @@ CIN: U51909MH2019PTC123456 | PAN: AAKCS1234F | GSTIN: 27AAKCS1234F1ZI | Financia
 | Repairs and Maintenance - Others | 12,000.00 |  |
 | **Total** | 7,74,000.00 | 0.00 |
 
+**PPE and intangible assets - movement in the year** (gross block and accumulated depreciation from the journal; add the Schedule III ageing of CWIP and any revaluation by hand)
+
+| Line | Block | Account | Opening | Additions / charge | Disposals / on disposals | Closing |
+| --- | --- | --- | ---: | ---: | ---: | ---: |
+| Property, plant and equipment | Gross block | Computers | 1,50,000.00 | 1,00,000.00 | 0.00 | 2,50,000.00 |
+| Property, plant and equipment | Gross block | Furniture and Fixtures | 3,00,000.00 | 0.00 | 0.00 | 3,00,000.00 |
+| Property, plant and equipment | Accumulated depreciation | Accumulated Depreciation - Computers | 90,000.00 | 61,602.32 | 0.00 | 1,51,602.32 |
+| Property, plant and equipment | Accumulated depreciation | Accumulated Depreciation - Furniture and Fixtures | 60,000.00 | 62,127.73 | 0.00 | 1,22,127.73 |
+| Property, plant and equipment | Net block |  | 3,00,000.00 |  |  | 2,76,269.95 |
+
+**Dues to micro and small enterprises at year end** (oldest bills first; payments assumed to clear the oldest bills; s.43B(h) and MSMED Act s.15/16)
+
+| Supplier | Bill / ref | Date | Amount | Age (days) | Pay by (15 days) | Pay by (45 days) |
+| --- | --- | --- | ---: | --- | --- | --- |
+| Rathod Components Pvt Ltd | RC/240 | 2026-03-10 | 3,54,000.00 | 21 | 2026-03-25 | 2026-04-24 |
+
+## Income tax and deferred tax
+
+| Particulars | 31-03-2026 |
+| --- | ---: |
+| Profit before tax | 9,59,269.95 |
+| Current tax | 2,60,120.00 |
+| Deferred tax | (15,166.39) |
+| Total tax expense | 2,44,953.61 |
+| Effective tax rate (%) | 25.54 |
+|  |  |
+| Provision for income tax (closing) | 2,60,120.00 |
+| Less: advance tax, TDS/TCS and self-assessment tax (closing) | 2,50,000.00 |
+| Net tax payable / (refundable) | 10,120.00 |
+|  |  |
+| Deferred tax liability / (asset), opening | 6,871.00 |
+| Charge / (credit) to profit and loss | (15,166.39) |
+| Deferred tax liability / (asset), closing | (8,295.39) |
+|  |  |
+| Income-tax computation (working/tax_computation.json) |  |
+| Total income | 10,33,530.00 |
+| Tax liability | 2,60,120.00 |
+| Interest u/s 234A/B/C | 1,930.00 |
+| Balance payable / (refund) | 12,050.00 |
+
 ## Ratios (Schedule III additional regulatory information)
 
 | Ratio | Current | Previous | Variance |  |
@@ -267,6 +307,9 @@ Debt service coverage ratio needs principal repayments - compute separately if t
 
 ## Checks before finalising
 
-- No issues found
+- Reverse-charge GST payable at year end 1,08,900.00 - payable in cash with the March GSTR-3B (due 20 April); the input credit is available only after payment
+- TDS payable at year end 7,500.00 - deposit by 30 April; if deposited after the ITR due date, 30% of the expense is disallowed u/s 40(a)(ia) and interest u/s 201(1A) applies
+
+Small company test (s.2(85)): paid-up capital 10,00,000.00 (limit 10,00,00,000), turnover 32,00,000.00 from aato_previous_fy (GST turnover) in company.json (limit 1,00,00,00,000): within both limits, so it is a small company unless it is a public company, a holding or subsidiary company, a s.8 company or governed by a special Act. A small company need not include the cash flow statement (s.2(40)); it is still shown here.
 
 _Draft prepared from the books. Review classifications, provisions, contingent liabilities, related-party and MSME disclosures, and Schedule III additional regulatory information before approval and audit._

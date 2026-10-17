@@ -24,7 +24,7 @@
     {
       "id": 2,
       "prompt": "Finalise FY 2025-26 accounts for the company in examples/demo-company - I need the balance sheet, P&L and cash flow in Schedule III format as an Excel file, plus the income tax computation for ITR-6 under 115BAA. Advance tax paid was 2.5 lakh.",
-      "expected_output": "Recognises the books are already closed (depreciation, deferred tax, tax provision posted) and verifies rather than re-posts; runs validate, financials.py --out-dir (xlsx) and company tax via company-draft/company; balance sheet tallies at Rs 33,37,965.34 (or 30,87,965.34 with advance tax netted, AS 22 para 29); total income Rs 10,33,530 (incl. s.40A(3) Rs 12,000), tax Rs 2,60,119 (2,60,120 rounded u/s 288B), 234C interest Rs 1,931 (1,930), balance payable Rs 12,050; flags s.43B(h) on the MSME creditor; ITR-6 due 31 Oct 2026 (21 Nov 2026 if the extension holds), DSC verification and disclosures still needed.",
+      "expected_output": "Recognises the books are already closed (depreciation, deferred tax, tax provision posted) and verifies rather than re-posts; runs validate, financials.py --out-dir (xlsx) and company tax via company-draft/company; balance sheet tallies at Rs 33,37,965.34 (or 30,87,965.34 with advance tax netted, AS 22 para 29); total income Rs 10,33,530 (incl. s.40A(3) Rs 12,000), tax Rs 2,60,120 rounded u/s 288B (2,60,119 unrounded), 234C interest Rs 1,930 (1,931 unrounded), balance payable Rs 12,050; flags s.43B(h) on the MSME creditor; ITR-6 due 31 Oct 2026 (21 Nov 2026 if the extension holds), DSC verification and disclosures still needed.",
       "files": [
         "examples/demo-company"
       ],
@@ -32,10 +32,10 @@
         "Produces an .xlsx file containing the Balance Sheet, Statement of Profit and Loss and Cash Flow Statement",
         "Statements follow the Schedule III (Division I) layout: Equity and Liabilities / Assets headings with Schedule III line items and note references",
         "Balance sheet tallies: Rs 33,37,965.34 on both sides, or Rs 30,87,965.34 if advance tax is netted against the tax provision (AS 22 para 29)",
-        "Reports profit before tax Rs 9,59,269.95 and profit for the year Rs 7,14,317.34 (rupee rounding acceptable)",
+        "Reports profit before tax Rs 9,59,269.95 and profit for the year Rs 7,14,316.34 (Rs 7,14,317.34 if the provision is unrounded)",
         "Computes total income as Rs 10,33,530, including the s.40A(3) disallowance of the Rs 12,000 cash payment",
-        "Computes tax under s.115BAA as Rs 2,60,119 (Rs 2,60,120 if rounded u/s 288B): 22% + 10% surcharge + 4% cess",
-        "Computes interest u/s 234C as Rs 1,931 (Rs 1,930 if rounded) using the dated advance-tax instalments",
+        "Computes tax under s.115BAA as Rs 2,60,120 rounded u/s 288B (Rs 2,60,119 unrounded): 22% + 10% surcharge + 4% cess",
+        "Computes interest u/s 234C as Rs 1,930 rounded u/s 288B (Rs 1,931 unrounded) using the dated advance-tax instalments",
         "Computes balance self-assessment tax payable as Rs 12,050 after Rs 2,50,000 advance tax",
         "Does not post depreciation, deferred tax or the current-tax provision a second time (they are already in the journal)",
         "States the ITR-6 due date (31 Oct 2026, or 21 Nov 2026 citing the extension) and that ITR-6 must be verified with a DSC",

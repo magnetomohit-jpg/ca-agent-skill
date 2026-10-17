@@ -1,5 +1,5 @@
-status,gstin,supplier,invoice,books_tax,gstr2b_tax,difference
-Matched,24AAGCR9012M1Z6,Rathod Components Pvt Ltd,RC/101,90000.00,90000.00,0.00
-Matched,27AACFM3456N1ZX,Mehta Packaging,MP/55,6000.00,6000.00,0.00
-Matched,27AAFCA2468B1ZZ,Annapurna Caterers,AC/77,1000.00,1000.00,0.00
-"In GSTR-2B, not in books",27AAJFS1357K1ZU,Speedy Couriers,SC/0009,0.00,900.00,-900.00
+status,gstin,supplier,invoice,books_tax,eligible_itc,gstr2b_tax,difference,itc_flag
+Matched,24AAGCR9012M1Z6,Rathod Components Pvt Ltd,RC/101,90000.00,90000.00,90000.00,0.00,
+Matched,27AACFM3456N1ZX,Mehta Packaging,MP/55,6000.00,6000.00,6000.00,0.00,
+Matched,27AAFCA2468B1ZZ,Annapurna Caterers,AC/77,1000.00,0.00,1000.00,0.00,blocked
+"In GSTR-2B, not in books",27AAJFS1357K1ZU,Speedy Couriers,SC/0009,0.00,0.00,900.00,-900.00,

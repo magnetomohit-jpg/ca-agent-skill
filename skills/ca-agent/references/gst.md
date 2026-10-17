@@ -233,6 +233,11 @@ unregistered persons and a payment voucher.
   - *In 2B, not in books*: book the bill if genuine, or reject it in IMS.
   - *Amount mismatch*: get a credit or debit note, or a correction from the supplier.
   - *ITC not available*: usually a place-of-supply issue or a supplier filed after the s.16(4) limit.
+  Each row also shows the eligible ITC (nil for bills marked blocked, ineligible or pos in the register's
+  `itc` column), and the report ends with a bridge from the 2B total to the 4(C) net ITC that `gstr3b`
+  computes: books less 2B per bucket, less blocked/ineligible credit, plus RCM, import and ISD credit
+  (never in 2B). `gstr3b` takes register ITC into 4(A)(5), so reverse credit on bills not yet in 2B with
+  `--reverse-other` and reclaim it in 4(D)(1) when the supplier files.
 
 ## 12. Annual return (GSTR-9 / 9C)
 

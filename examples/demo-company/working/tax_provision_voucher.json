@@ -7,11 +7,11 @@
     "lines": [
       {
         "account": "Current Tax",
-        "dr": 260119.0
+        "dr": 260120.0
       },
       {
         "account": "Provision for Income Tax",
-        "cr": 260119.0
+        "cr": 260120.0
       }
     ]
   }

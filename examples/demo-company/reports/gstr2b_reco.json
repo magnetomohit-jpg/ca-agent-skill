@@ -3,11 +3,13 @@
     "Matched": {
       "count": 3,
       "books": 97000.0,
+      "eligible_itc": 96000.0,
       "gstr2b": 97000.0
     },
     "In GSTR-2B, not in books": {
       "count": 1,
       "books": 0.0,
+      "eligible_itc": 0.0,
       "gstr2b": 900.0
     }
   },
@@ -18,8 +20,10 @@
       "supplier": "Rathod Components Pvt Ltd",
       "invoice": "RC/101",
       "books_tax": 90000.0,
+      "eligible_itc": 90000.0,
       "gstr2b_tax": 90000.0,
-      "difference": 0.0
+      "difference": 0.0,
+      "itc_flag": ""
     },
     {
       "status": "Matched",
@@ -27,8 +31,10 @@
       "supplier": "Mehta Packaging",
       "invoice": "MP/55",
       "books_tax": 6000.0,
+      "eligible_itc": 6000.0,
       "gstr2b_tax": 6000.0,
-      "difference": 0.0
+      "difference": 0.0,
+      "itc_flag": ""
     },
     {
       "status": "Matched",
@@ -36,8 +42,10 @@
       "supplier": "Annapurna Caterers",
       "invoice": "AC/77",
       "books_tax": 1000.0,
+      "eligible_itc": 0.0,
       "gstr2b_tax": 1000.0,
-      "difference": 0.0
+      "difference": 0.0,
+      "itc_flag": "blocked"
     },
     {
       "status": "In GSTR-2B, not in books",
@@ -45,8 +53,39 @@
       "supplier": "Speedy Couriers",
       "invoice": "SC/0009",
       "books_tax": 0.0,
+      "eligible_itc": 0.0,
       "gstr2b_tax": 900.0,
-      "difference": -900.0
+      "difference": -900.0,
+      "itc_flag": ""
     }
-  ]
+  ],
+  "bridge": [
+    {
+      "particulars": "ITC as per GSTR-2B (B2B bills)",
+      "amount": 97900.0
+    },
+    {
+      "particulars": "Add/(less): books less 2B on 'In GSTR-2B, not in books'",
+      "amount": -900.0
+    },
+    {
+      "particulars": "Tax on B2B forward-charge bills in the purchase register",
+      "amount": 97000.0
+    },
+    {
+      "particulars": "Less: blocked u/s 17(5), ineligible or PoS-restricted on those bills",
+      "amount": -1000.0
+    },
+    {
+      "particulars": "Add: ITC on other register lines (RCM incl. import of services, import of goods, ISD, bills without GSTIN)",
+      "amount": 9900.0
+    },
+    {
+      "particulars": "= 4(C) net ITC per gstr3b (before --reverse-42-43 / --reverse-other)",
+      "amount": 105900.0
+    }
+  ],
+  "net_itc_4c": 105900.0,
+  "rcm_itc": 9900.0,
+  "itc_not_in_2b": 0.0
 }

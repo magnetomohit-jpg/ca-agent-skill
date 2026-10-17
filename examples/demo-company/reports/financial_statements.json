@@ -4,7 +4,7 @@
   "as_of": "2026-03-31",
   "balance_sheet": {
     "share_capital": 1000000.0,
-    "other_equity": 1057446.34,
+    "other_equity": 1057445.34,
     "share_application_money": 0.0,
     "lt_borrowings": 500000.0,
     "deferred_tax_liab": 0.0,
@@ -14,7 +14,7 @@
     "trade_payables_msme": 354000.0,
     "trade_payables_others": 0.0,
     "other_current_liabilities": 166400.0,
-    "st_provisions": 260119.0,
+    "st_provisions": 260120.0,
     "ppe": 276269.95,
     "intangible_assets": 0.0,
     "cwip": 0.0,
@@ -50,9 +50,9 @@
     "profit_before_exceptional": 959269.95,
     "exceptional": 0.0,
     "pbt": 959269.95,
-    "current_tax": 260119.0,
+    "current_tax": 260120.0,
     "deferred_tax": -15166.39,
-    "pat": 714317.34
+    "pat": 714316.34
   },
   "cash_flow": {
     "operating": [
@@ -246,7 +246,10 @@
       "explain": false
     }
   ],
-  "checks": [],
+  "checks": [
+    "Reverse-charge GST payable at year end 1,08,900.00 - payable in cash with the March GSTR-3B (due 20 April); the input credit is available only after payment",
+    "TDS payable at year end 7,500.00 - deposit by 30 April; if deposited after the ITR due date, 30% of the expense is disallowed u/s 40(a)(ia) and interest u/s 201(1A) applies"
+  ],
   "notes": {
     "share_capital": [
       [
@@ -261,7 +264,7 @@
       ],
       [
         "Profit/(loss) for the year",
-        714317.34
+        714316.34
       ]
     ],
     "lt_borrowings": [
@@ -301,7 +304,7 @@
     "st_provisions": [
       [
         "Provision for Income Tax",
-        260119.0
+        260120.0
       ]
     ],
     "ppe": [
@@ -324,7 +327,7 @@
     ],
     "deferred_tax_asset": [
       [
-        "Deferred Tax Liability (Net)",
+        "Deferred Tax Liability (Net) (debit balance, shown as a deferred tax asset)",
         8295.39
       ]
     ],
@@ -443,7 +446,7 @@
     "current_tax": [
       [
         "Current Tax",
-        260119.0
+        260120.0
       ]
     ],
     "deferred_tax": [
@@ -452,5 +455,143 @@
         -15166.39
       ]
     ]
-  }
+  },
+  "small_company": true,
+  "small_company_test": "Small company test (s.2(85)): paid-up capital 10,00,000.00 (limit 10,00,00,000), turnover 32,00,000.00 from aato_previous_fy (GST turnover) in company.json (limit 1,00,00,00,000): within both limits, so it is a small company unless it is a public company, a holding or subsidiary company, a s.8 company or governed by a special Act. A small company need not include the cash flow statement (s.2(40)); it is still shown here.",
+  "msme_dues": [
+    {
+      "supplier": "Rathod Components Pvt Ltd",
+      "ref": "RC/240",
+      "date": "2026-03-10",
+      "amount": 354000.0,
+      "age_days": 21,
+      "pay_by_15": "2026-03-25",
+      "pay_by_45": "2026-04-24"
+    }
+  ],
+  "ppe_reconciliation": [
+    [
+      "Property, plant and equipment",
+      "Gross block",
+      "Computers",
+      150000.0,
+      100000.0,
+      0.0,
+      250000.0
+    ],
+    [
+      "Property, plant and equipment",
+      "Gross block",
+      "Furniture and Fixtures",
+      300000.0,
+      0.0,
+      0.0,
+      300000.0
+    ],
+    [
+      "Property, plant and equipment",
+      "Accumulated depreciation",
+      "Accumulated Depreciation - Computers",
+      90000.0,
+      61602.32,
+      0.0,
+      151602.32
+    ],
+    [
+      "Property, plant and equipment",
+      "Accumulated depreciation",
+      "Accumulated Depreciation - Furniture and Fixtures",
+      60000.0,
+      62127.73,
+      0.0,
+      122127.73
+    ],
+    [
+      "Property, plant and equipment",
+      "Net block",
+      "",
+      300000.0,
+      "",
+      "",
+      276269.95
+    ]
+  ],
+  "tax": [
+    [
+      "Profit before tax",
+      959269.95
+    ],
+    [
+      "Current tax",
+      260120.0
+    ],
+    [
+      "Deferred tax",
+      -15166.39
+    ],
+    [
+      "Total tax expense",
+      244953.61
+    ],
+    [
+      "Effective tax rate (%)",
+      25.54
+    ],
+    [
+      "",
+      ""
+    ],
+    [
+      "Provision for income tax (closing)",
+      260120.0
+    ],
+    [
+      "Less: advance tax, TDS/TCS and self-assessment tax (closing)",
+      250000.0
+    ],
+    [
+      "Net tax payable / (refundable)",
+      10120.0
+    ],
+    [
+      "",
+      ""
+    ],
+    [
+      "Deferred tax liability / (asset), opening",
+      6871.0
+    ],
+    [
+      "Charge / (credit) to profit and loss",
+      -15166.39
+    ],
+    [
+      "Deferred tax liability / (asset), closing",
+      -8295.39
+    ],
+    [
+      "",
+      ""
+    ],
+    [
+      "Income-tax computation (working/tax_computation.json)",
+      ""
+    ],
+    [
+      "Total income",
+      1033530.0
+    ],
+    [
+      "Tax liability",
+      260120.0
+    ],
+    [
+      "Interest u/s 234A/B/C",
+      1930.0
+    ],
+    [
+      "Balance payable / (refund)",
+      12050.0
+    ]
+  ]
 }

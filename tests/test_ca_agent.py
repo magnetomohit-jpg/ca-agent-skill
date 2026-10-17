@@ -21,7 +21,7 @@ sys.path.insert(0, str(SCRIPTS))
 sys.path.insert(0, str(ROOT / "examples"))
 
 import build_demo  # noqa: E402
-from common import gstin_checksum, gstin_problem, inr, parse_period  # noqa: E402
+from common import gstin_checksum, gstin_problem, inr, parse_period, round_288b  # noqa: E402
 from gst import set_off  # noqa: E402
 from income_tax import company_tax, individual_tax, interest_234b, interest_234c, mat_tax  # noqa: E402
 
@@ -60,10 +60,21 @@ class DemoCompany(unittest.TestCase):
         self.assertEqual(fs["total_assets"], fs["total_equity_liabilities"])
         self.assertEqual(fs["total_assets"], 3337965.34)
         self.assertEqual(fs["profit_and_loss"]["pbt"], 959269.95)
-        self.assertEqual(fs["profit_and_loss"]["pat"], 714317.34)
+        self.assertEqual(fs["profit_and_loss"]["pat"], 714316.34)              # tax provision 2,60,120 (s.288B)
         self.assertEqual(fs["cash_flow"]["difference"], 0)
         self.assertEqual(fs["cash_flow"]["net_change"], 442100.0)
-        self.assertEqual(fs["checks"], [])
+        # March RCM (54,450 x 2) and TDS (7,500) are still payable at 31 March; nothing else is flagged.
+        self.assertEqual(len(fs["checks"]), 2)
+        self.assertIn("Reverse-charge GST payable at year end 1,08,900.00", fs["checks"][0])
+        self.assertIn("TDS payable at year end 7,500.00", fs["checks"][1])
+        self.assertTrue(fs["small_company"])
+        self.assertEqual([(m["ref"], m["amount"], m["age_days"]) for m in fs["msme_dues"]], [("RC/240", 354000.0, 21)])
+        net_block = [r for r in fs["ppe_reconciliation"] if r[1] == "Net block"]
+        self.assertEqual(net_block[0][-1], fs["balance_sheet"]["ppe"])
+        tax = {r[0]: r[1] for r in fs["tax"] if r[0]}
+        self.assertEqual(tax["Net tax payable / (refundable)"], 10120.0)
+        self.assertEqual(tax["Deferred tax liability / (asset), closing"], -8295.39)
+        self.assertNotIn("Difference: current tax booked less computed liability", tax)
 
     def test_depreciation(self):
         dep = self.result["depreciation"]
@@ -73,8 +84,8 @@ class DemoCompany(unittest.TestCase):
     def test_company_tax(self):
         tax = self.result["tax"]
         self.assertEqual(tax["total_income"], 1033530.0)
-        self.assertEqual(tax["liability"], 260119.0)                 # 25.168% under s.115BAA
-        self.assertEqual(tax["interest_234c"], 1931.0)
+        self.assertEqual(tax["liability"], 260120.0)                 # 25.168% under s.115BAA, rounded u/s 288B
+        self.assertEqual(tax["interest_234c"], 1930.0)
         self.assertEqual(tax["interest_234b"], 0)
         self.assertEqual(tax["balance_payable"], 12050.0)
 
@@ -104,6 +115,28 @@ class DemoCompany(unittest.TestCase):
                      ROOT / "examples" / "inputs" / "gstr2b_apr2025.csv")
         self.assertEqual(r["summary"]["Matched"]["count"], 3)        # RC-101 vs RC/101 normalised
         self.assertEqual(r["summary"]["In GSTR-2B, not in books"]["count"], 1)
+        self.assertEqual(r["summary"]["Matched"]["eligible_itc"], 96000.0)   # AC/77 catering blocked u/s 17(5)
+        self.assertEqual(r["bridge"][0]["amount"], 97900.0)
+        self.assertEqual(r["bridge"][-1]["amount"], r["net_itc_4c"])
+        self.assertEqual(r["net_itc_4c"], 105900.0)                  # 90,000 + 6,000 + 9,900 RCM
+        self.assertEqual(r["rcm_itc"], 9900.0)
+        self.assertNotIn("warnings", r)
+
+    def test_company_draft(self):
+        out = Path(self.tmp.name) / "draft.json"
+        run("income_tax.py", "company-draft", self.books, "--out", out)
+        d = json.loads(out.read_text(encoding="utf-8"))
+        self.assertFalse(d["tax_audit"])
+        self.assertEqual([(m["ref"], m["pay_by_45_days"]) for m in d["msme_dues_at_year_end"]], [("RC/240", "2026-04-24")])
+        self.assertTrue(any("even when that date falls after 31 March" in t for t in d["todo"]))
+        md = (self.books / "working" / "tax_computation.md").read_text(encoding="utf-8")
+        self.assertNotIn("3CA-3CD acknowledgement", md)
+
+    def test_compliance_overdue(self):
+        c = run_json("compliance.py", self.books, "--from", "2026-10-17", "--days", "30")
+        overdue = {e["item"] for e in c["overdue_unless_done"]}
+        self.assertIn("Hold AGM (within 6 months of year end)", overdue)
+        self.assertTrue(all(e["date"] >= "2026-10-17" for e in c["events"]))
 
     def test_bank_reco(self):
         b = run_json("bank_reco.py", self.books, "--account", "HDFC Bank Current A/c", "--statement",
@@ -118,6 +151,55 @@ class DemoCompany(unittest.TestCase):
         out = run("books.py", "tb", nxt)
         self.assertIn("Tallied.", out)
         self.assertTrue((nxt / "fixed_assets.csv").read_text().count("FA-00") == 3)
+
+
+class Individuals(unittest.TestCase):
+    PERSON = {"name": "Test", "fy": "2025-26", "age": 32, "tds": 300000,
+              "salary": {"gross": 2400000, "professional_tax": 2500,
+                         "hra": {"received": 360000, "rent_paid": 300000, "basic_da": 960000, "city": "Pune"}},
+              "deductions_old": {"80C": 150000, "80D": 25000}}
+
+    def write(self, data) -> Path:
+        tmp = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8")
+        json.dump(data, tmp)
+        tmp.close()
+        self.addCleanup(Path(tmp.name).unlink)
+        return Path(tmp.name)
+
+    def test_hra_rule_2a(self):
+        self.assertEqual(individual_tax(self.PERSON, "old")["hra_exempt"], D(204000))   # 3,00,000 less 10% of 9,60,000
+        self.assertEqual(individual_tax(self.PERSON, "new")["hra_exempt"], 0)
+
+    def test_on_time_return(self):
+        r = run_json("income_tax.py", "individual", self.write(dict(self.PERSON, filing_date="2026-07-31")))
+        self.assertFalse(r["belated"])
+        self.assertEqual(r["late"]["new"]["fee_234f"], 0)
+        self.assertEqual(r["old"]["total_tax"], 419170.0)
+        self.assertEqual(r["recommended"], "new")
+
+    def test_belated_return_locked_into_new_regime(self):
+        # High deductions make the old regime cheaper, but a belated return cannot opt out of the new one.
+        p = {"fy": "2025-26", "salary": {"gross": 1500000}, "filing_date": "2026-10-17",
+             "deductions_old": {"80C": 150000, "80D": 50000, "80CCD1B": 50000, "OTHER": 400000}}
+        r = run_json("income_tax.py", "individual", self.write(p))
+        self.assertTrue(r["belated"])
+        self.assertFalse(r["old_regime_available"])
+        self.assertLess(r["old"]["total_tax"], r["new"]["total_tax"])
+        self.assertEqual(r["recommended"], "new")
+        late = r["late"]["new"]
+        self.assertEqual(late["fee_234f"], 5000.0)
+        # 234A: unpaid tax rounded down to Rs 100, 1% a month for Aug-Oct 2026, then rounded u/s 288B
+        self.assertEqual(late["interest_234a"], float(round_288b(D(r["new"]["total_tax"]) // 100 * 100 * D("0.03"))))
+        self.assertEqual(late["payable"] % 10, 0)
+
+    def test_itr_form_due_date(self):
+        f = self.write({"fy": "2025-26", "total_income": 1500000})
+        r = run_json("income_tax.py", "itr-form", f, "--as-of", "2026-10-17")
+        self.assertEqual((r["form"], r["status"], r["due_date"]), ("ITR-1", "belated", "2026-07-31"))
+        self.assertEqual(run_json("income_tax.py", "itr-form", f, "--as-of", "2027-01-05")["status"], "window_closed")
+        with tempfile.TemporaryDirectory() as out:
+            run("income_tax.py", "itr-form", f, "--as-of", "2026-07-01", "--out-dir", out)
+            self.assertEqual(json.loads((Path(out) / "itr_form.json").read_text(encoding="utf-8"))["status"], "on_time")
 
 
 class Rules(unittest.TestCase):
@@ -151,6 +233,12 @@ class Rules(unittest.TestCase):
         r = set_off({"igst": z, "cgst": D(100), "sgst": D(100), "cess": z},
                     {"igst": D(100), "cgst": D(50), "sgst": D(50), "cess": z})
         self.assertEqual(sum(r["cash"].values()), 0)
+
+    def test_round_288b(self):
+        self.assertEqual(round_288b(D("260119.40")), 260120)
+        self.assertEqual(round_288b(D("1934.99")), 1930)
+        self.assertEqual(round_288b(D("1935")), 1940)
+        self.assertEqual(round_288b(D("-2504")), -2500)
 
     def test_helpers(self):
         self.assertEqual(inr(D("12345678.5")), "1,23,45,678.50")

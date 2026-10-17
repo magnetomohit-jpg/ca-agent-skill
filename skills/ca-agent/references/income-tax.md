@@ -277,7 +277,7 @@ per month for others.
  "chapter_via": [{"section": "80JJAA", "amount": 0}],
  "mat_adjustments": [{"item": "Provision for diminution", "amount": 0}], "mat_credit_bf": 0, "mat_credit_usable": false,
  "tds_tcs": 0, "advance_tax": [{"date": "2025-06-14", "amount": 30000}],
- "self_assessment_paid": [], "filing_date": "2026-10-31", "due_date": null}
+ "self_assessment_paid": [], "tax_audit": false, "filing_date": "2026-10-31", "due_date": null}
 ```
 
 `income_other_heads` amounts must already be inside `profit_before_tax`. They are taken out of business
@@ -287,7 +287,8 @@ income and taxed under their own head; keys `stcg_111a`, `ltcg_112a` and `ltcg_1
 
 ```json
 {"name": "A. Sharma", "fy": "2025-26", "age": 34, "resident": true,
- "salary": {"gross": 1800000, "exempt_allowances_old": {"hra": 180000}, "professional_tax": 2500},
+ "salary": {"gross": 1800000, "professional_tax": 2500, "exempt_allowances_old": {"lta": 20000},
+            "hra": {"received": 240000, "rent_paid": 300000, "basic_da": 720000, "city": "Mumbai"}},
  "house_property": [{"type": "self_occupied", "interest": 150000},
                     {"type": "let_out", "rent": 240000, "municipal_tax": 12000, "interest": 90000}],
  "business_income": 0,
@@ -295,8 +296,16 @@ income and taxed under their own head; keys `stcg_111a`, `ltcg_112a` and `ltcg_1
  "other_sources": {"savings_interest": 12000, "fd_interest": 40000, "dividend": 5000, "family_pension": 0},
  "deductions_old": {"80C": 150000, "80CCD1B": 50000, "80D": 25000, "80TTA": 10000, "80CCD2": 0},
  "deductions_new": {"80CCD2": 0},
- "tds": 150000, "advance_tax": []}
+ "tds": 150000, "advance_tax": [], "self_assessment_paid": [],
+ "filing_date": "2026-07-25", "due_date": null, "form_10iea_filed": false}
 ```
+
+`salary.hra` is worked out under rule 2A (least of HRA received, rent less 10% of `basic_da`, and 50% of
+`basic_da` in Delhi/Mumbai/Kolkata/Chennai or 40% elsewhere; `"metro": true/false` overrides `city`). Do not
+also put `hra` in `exempt_allowances_old`. `filing_date` drives s.234A/B/C interest and the s.234F fee; when
+it is missing the return is taken as filed on the due date, or today (`--as-of`) if that has passed.
+`due_date` overrides the date from rules.py. A belated return is computed under both regimes but recommended
+under the new one (s.115BAC(6)), unless `form_10iea_filed` is true for a taxpayer with business income.
 
 **ITR form (`income_tax.py itr-form`):**
 
@@ -305,5 +314,8 @@ income and taxed under their own head; keys `stcg_111a`, `ltcg_112a` and `ltcg_1
  "business_income": false, "presumptive": false, "director": false, "unlisted_shares": false,
  "foreign_assets": false, "house_properties": 1, "agricultural_income": 0,
  "capital_gains": {"ltcg_112a": 0}, "turnover": 0, "gross_receipts_profession": 0,
- "cash_receipts_and_payments_within_5pct": true}
+ "cash_receipts_and_payments_within_5pct": true, "tax_audit": false, "due_date": null}
 ```
+
+`itr-form --as-of <date>` (default today) also reports whether the return is on time, belated (by
+31 December) or past the belated deadline (ITR-U only); `--out-dir` saves `itr_form.md`/`.json`.

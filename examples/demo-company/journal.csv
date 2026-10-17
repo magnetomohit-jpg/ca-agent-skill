@@ -156,5 +156,5 @@ date,voucher_no,voucher_type,account,debit,credit,narration,ref
 2026-03-31,JV/2025-26/0008,Journal,Accumulated Depreciation - Computers,0.00,61602.32,Depreciation for FY 2025-26 as per Schedule II (WDV),DEP-2025-26
 2026-03-31,JV/2025-26/0009,Journal,Deferred Tax Liability (Net),15166.39,0.00,Deferred tax on depreciation timing difference (AS 22),DT-FY2526
 2026-03-31,JV/2025-26/0009,Journal,Deferred Tax,0.00,15166.39,Deferred tax on depreciation timing difference (AS 22),DT-FY2526
-2026-03-31,JV/2025-26/0010,Journal,Current Tax,260119.00,0.00,Provision for income tax FY 2025-26 (s.115BAA),TAX-PROV-FY2526
-2026-03-31,JV/2025-26/0010,Journal,Provision for Income Tax,0.00,260119.00,Provision for income tax FY 2025-26 (s.115BAA),TAX-PROV-FY2526
+2026-03-31,JV/2025-26/0010,Journal,Current Tax,260120.00,0.00,Provision for income tax FY 2025-26 (s.115BAA),TAX-PROV-FY2526
+2026-03-31,JV/2025-26/0010,Journal,Provision for Income Tax,0.00,260120.00,Provision for income tax FY 2025-26 (s.115BAA),TAX-PROV-FY2526

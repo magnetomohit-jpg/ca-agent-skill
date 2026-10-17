@@ -3,14 +3,24 @@
 
     income_tax.py company-draft <books-folder> [--depreciation-json dep/depreciation.json] --out tax_input.json
     income_tax.py company <tax_input.json> [--out-dir out/] [--json]
-    income_tax.py individual <person.json> [--json]
-    income_tax.py itr-form <profile.json>
+    income_tax.py individual <person.json> [--as-of 2026-10-17] [--out-dir out/] [--json]
+    income_tax.py itr-form <profile.json> [--as-of 2026-10-17] [--out-dir out/] [--json]
     income_tax.py advance-tax --tax 250000 --fy 2026-27 [--presumptive]
     income_tax.py tds-rates
 
 company-draft reads the books and pre-fills a computation input (profit, book depreciation, tagged
 disallowances, interest income, TDS and advance tax with dates, cash payments over Rs 10,000 for
-s.40A(3)) plus a TODO list of items that need judgment. Edit the JSON, then run `company`.
+s.40A(3), MSME bills open at 31 March with their age and s.43B(h) pay-by dates, tax_audit from
+company.json) plus a TODO list of items that need judgment. Edit the JSON, then run `company`.
+
+individual compares the old and new regimes. salary.hra = {received, rent_paid, basic_da, city or metro}
+computes the HRA exemption under rule 2A (old regime only). filing_date (default: the due date, or
+--as-of/today if the due date has passed) drives interest u/s 234A/B/C and the s.234F fee; a belated
+return is locked into the new regime (s.115BAC(6)) unless form_10iea_filed is set for business income.
+itr-form picks the form and due date and says whether, as of --as-of/today, the return is on time,
+belated or past the belated deadline.
+Tax, interest, fees and the balance payable are rounded to the nearest Rs 10 (s.288B); total income
+to the nearest Rs 10 (s.288A).
 All rates come from rules.py; FY 2025-26 is computed under the Income-tax Act 1961 and FY 2026-27
 onwards under the Income-tax Act 2025 (same rate structure, renumbered sections).
 """
@@ -23,7 +33,7 @@ from pathlib import Path
 
 import rules
 from common import (ZERO, Books, BooksError, D, dump_json, emit, fy_bounds, inr, load_json, md_table, money,
-                    months_between_inclusive, parse_date, round_down_100, round_to_10, rupee, run_cli)
+                    months_between_inclusive, parse_date, round_288b, round_down_100, round_to_10, rupee, run_cli)
 
 P = lambda x: Decimal(str(x))  # noqa: E731  - rate literal to Decimal
 
@@ -70,7 +80,7 @@ def interest_234c(tax_due: Decimal, payments: list[tuple[date, Decimal]], fy: st
         interest = round_down_100(shortfall) * P(0.01) * months
         rows.append([due.isoformat(), f"{int(pct * 100)}%", money(required), money(paid), money(shortfall), months, money(interest)])
         total += interest
-    return money(total), rows
+    return round_288b(total), rows
 
 
 def interest_234b(assessed: Decimal, advance_paid: Decimal, sa: list[tuple[date, Decimal]], fy: str, upto: date) -> Decimal:
@@ -88,13 +98,13 @@ def interest_234b(assessed: Decimal, advance_paid: Decimal, sa: list[tuple[date,
         remaining -= part
     if remaining > 0:
         interest += round_down_100(remaining) * P(0.01) * months_between_inclusive(start, upto)
-    return money(interest)
+    return round_288b(interest)
 
 
 def interest_234a(unpaid: Decimal, due: date, filed: date) -> Decimal:
     if filed <= due or unpaid <= 0:
         return ZERO
-    return money(round_down_100(unpaid) * P(0.01) * months_between_inclusive(due + timedelta(days=1), filed))
+    return round_288b(round_down_100(unpaid) * P(0.01) * months_between_inclusive(due + timedelta(days=1), filed))
 
 
 def payments(items) -> list[tuple[date, Decimal]]:
@@ -142,7 +152,7 @@ def company_tax(normal: Decimal, special: dict, regime: str, turnover_fy2: Decim
     cess = money((base + surcharge - relief) * P(rules.CESS))
     return {"rate": rate, "tax_normal": money(normal * rate), "tax_special": money(special_tax), "base": money(base),
             "surcharge": surcharge, "marginal_relief": relief, "cess": cess,
-            "total": rupee(base + surcharge - relief + cess)}
+            "total": round_288b(base + surcharge - relief + cess)}
 
 
 def mat_tax(book_profit: Decimal, fy: str) -> dict:
@@ -152,7 +162,7 @@ def mat_tax(book_profit: Decimal, fy: str) -> dict:
     surcharge, relief = surcharge_with_relief(base_fn, book_profit, rules.COMPANY["surcharge_normal"])
     cess = money((base + surcharge - relief) * P(rules.CESS))
     return {"rate": rate, "base": money(base), "surcharge": surcharge, "marginal_relief": relief, "cess": cess,
-            "total": rupee(base + surcharge - relief + cess)}
+            "total": round_288b(base + surcharge - relief + cess)}
 
 
 def cmd_company(args):
@@ -228,7 +238,7 @@ def cmd_company(args):
     i234a = interest_234a(tax_due_234 - adv_total - sa_before_due, due, filed)
     fee = P(rules.LATE_FILING_FEE["default"]) if filed > due else ZERO
     paid = tds + adv_total + sum((a for _, a in sa), ZERO)
-    balance = round_to_10(liability + i234a + i234b + i234c + fee - paid)  # s.288B
+    balance = round_288b(liability + i234a + i234b + i234c + fee - paid)
 
     lines = [["**Profits and gains of business or profession**", ""], ["Net profit before tax as per P&L", pbt],
              ["Add:", ""]]
@@ -274,12 +284,15 @@ def cmd_company(args):
     md = [f"# Computation of total income - {inp.get('name', '')}",
           f"FY {fy} ({year_label}) | "
           f"Status: domestic company | Regime: {regime} | Return: ITR-6 (e-verify with DSC) | Due date {due}", "",
-          md_table(["Particulars", "Rs"], lines, right={1}), ""]
+          md_table(["Particulars", "Rs"], lines, right={1}), "",
+          "_Tax, interest and the balance payable are rounded to the nearest Rs 10 u/s 288B._", ""]
     if c_rows:
         md += ["## Interest u/s 234C (deferment of advance tax)", "",
                md_table(["Instalment due", "Cumulative %", "Required", "Paid", "Shortfall", "Months", "Interest"], c_rows), ""]
+    audit_info = ("audit info: Companies Act audit and the Form 3CA-3CD acknowledgement" if inp.get("tax_audit")
+                  else "audit info: Companies Act audit only, no tax audit u/s 44AB as tax_audit is false")
     md += ["## ITR-6 schedules to fill", "",
-           "- Part A-GEN (company details, audit info: Form 3CA-3CD acknowledgement), Part A-BS / A-P&L (from financials.py)",
+           f"- Part A-GEN (company details, {audit_info}), Part A-BS / A-P&L (from financials.py)",
            "- Schedule BP (business income, add-backs/deductions above), Schedule DOA/DEP (from depreciation.py IT chart)",
            "- Schedule OS / CG for other heads; Schedule CYLA/BFLA/CFL for losses; Schedule VI-A",
            f"- {'Schedule MAT / MATC' if regime == 'normal' else 'Option for s.' + regime + ' (Form 10-IC filed in the first year of option)'}",
@@ -365,13 +378,29 @@ def cmd_company_draft(args):
         "Confirm tax depreciation (depreciation.py) and remove book depreciation if already adjusted",
         "s.43B: statutory dues (PF/ESI employer share, bonus, leave encashment, GST, interest to banks) unpaid at year end "
         "and not paid by the ITR due date must be added back",
-        "s.43B(h): amounts due to micro/small enterprises outstanding beyond 15/45 days at year end and unpaid by 31 March are disallowed",
+        "s.43B(h): a purchase or expense owed to a micro or small enterprise (manufacturer or service provider, not a "
+        "trader) is deductible this year only if paid within the MSMED Act s.15 period - 15 days, or the agreed credit "
+        "term up to 45 days - even when that date falls after 31 March; otherwise it is allowed in the year of payment. "
+        "msme_dues_at_year_end lists the open bills with their age and pay-by dates: get the payment dates and credit "
+        "terms, confirm each supplier's Udyam category, and add back the bills not paid in time",
         "s.40(a)(ia): 30% of expenses on which TDS was not deducted/deposited by the ITR due date",
         "s.36(1)(va): employees' PF/ESI contribution deposited after the statutory due date is disallowed in full",
         "s.40A(2)(b): excess payments to related parties; s.37: personal or capital expenditure",
         "Income-tax/deferred tax are below PBT - do not add back again",
         "Turnover of FY-2 decides 25% vs 30% under the normal regime",
     ]
+    msme = financials.msme_open_items(books, books.fy_end)
+    msme_rows = [{"supplier": i["supplier"], "ref": i["ref"], "date": i["date"], "amount": i["amount"],
+                  "age_days_at_year_end": i["age_days"], "pay_by_15_days": i["pay_by_15"], "pay_by_45_days": i["pay_by_45"],
+                  "status": ("brought forward from an earlier year - check when it was paid" if i["date"] is None else
+                             "over 45 days old at year end - disallow this year" if i["age_days"] > 45 else
+                             "deductible this year only if paid by the pay-by date")} for i in msme]
+    if any(r["status"].startswith("over") for r in msme_rows):
+        todo.insert(0, "s.43B(h): MSME bills already over 45 days old at 31 March are listed in msme_dues_at_year_end - "
+                       "add them back unless the supplier is a trader or not micro/small")
+    if not books.company.get("tax_audit"):
+        todo.append("tax_audit is false: no Form 3CA-3CD; if turnover or receipts cross the s.44AB limits, set tax_audit "
+                    "to true and get the tax audit report before filing")
     if cash_payments:
         todo.insert(0, f"s.40A(3): {len(cash_payments)} cash payment voucher(s) above Rs 10,000 listed under cash_payments_over_10000 - "
                        "disallow those that are expenses (Rs 35,000 for transporters) unless a rule 6DD exception applies")
@@ -384,7 +413,8 @@ def cmd_company_draft(args):
         "income_other_heads": other_heads, "brought_forward": {"business_loss": 0, "unabsorbed_depreciation": 0},
         "chapter_via": [], "mat_adjustments": [], "mat_credit_bf": 0,
         "tds_tcs": money(tds), "advance_tax": adv, "self_assessment_paid": [],
-        "filing_date": None, "cash_payments_over_10000": cash_payments, "todo": todo,
+        "tax_audit": bool(books.company.get("tax_audit")), "filing_date": None,
+        "cash_payments_over_10000": cash_payments, "msme_dues_at_year_end": msme_rows, "todo": todo,
     }
     if draft["regime"] not in {"115BAA", "115BAB", "normal"}:
         draft["regime"] = "115BAA"
@@ -396,6 +426,29 @@ def cmd_company_draft(args):
 
 # --------------------------------------------------------------------------- individuals
 
+def hra_exemption(sal: dict, fy: str) -> dict | None:
+    """Rule 2A: least of HRA received, rent paid less 10% of salary, 50%/40% of salary (salary = basic + DA)."""
+    h = sal.get("hra")
+    if not h:
+        return None
+    if "hra" in {k.lower() for k in (sal.get("exempt_allowances_old") or {})}:
+        raise BooksError("Give HRA either as salary.hra (computed under rule 2A) or in exempt_allowances_old, not both")
+    if h.get("basic_da") in (None, ""):
+        raise BooksError("salary.hra needs basic_da (basic + DA for the months rent was paid) to apply rule 2A")
+    received, rent, basic = money(h.get("received")), money(h.get("rent_paid")), money(h.get("basic_da"))
+    if "metro" in h:
+        metro = bool(h["metro"])
+    else:
+        cities = fy_rules(rules.HRA_METRO_CITIES, fy)
+        metro = str(h.get("city", "")).strip().lower() in {c.lower() for c in cities}
+    pct = P(rules.HRA_METRO_PCT if metro else rules.HRA_OTHER_PCT)
+    limbs = {"HRA received": received,
+             "Rent paid less 10% of salary": max(ZERO, rent - basic * P(rules.HRA_RENT_EXCESS_PCT)),
+             f"{int(pct * 100)}% of salary ({'metro' if metro else 'non-metro'})": money(basic * pct)}
+    exempt = min(limbs.values())
+    return {"limbs": limbs, "exempt": exempt, "taxable": received - exempt, "metro": metro}
+
+
 def individual_tax(p: dict, regime: str) -> dict:
     fy = p.get("fy", "2025-26")
     r = fy_rules(rules.INDIVIDUAL, fy)[regime]
@@ -404,10 +457,13 @@ def individual_tax(p: dict, regime: str) -> dict:
     sal = p.get("salary") or {}
     gross = money(sal.get("gross"))
     salary = ZERO
+    hra = hra_exemption(sal, fy)
+    hra_exempt = hra["exempt"] if (hra and regime == "old") else ZERO
     if gross:
         salary = gross - P(r["std_deduction"])
         if regime == "old":
             salary -= sum((money(v) for v in (sal.get("exempt_allowances_old") or {}).values()), ZERO)
+            salary -= hra_exempt
             salary -= min(money(sal.get("professional_tax")), P(2500))
         salary = max(ZERO, salary)
     hp = ZERO
@@ -481,34 +537,118 @@ def individual_tax(p: dict, regime: str) -> dict:
         cap = at_threshold * (1 + min(lower_rate, rate)) + (total - threshold)
         relief = max(ZERO, base + surcharge - cap)
     cess = (base + surcharge - relief) * P(rules.CESS)
-    total_tax = rupee(base + surcharge - relief + cess)
-    return {"regime": regime, "salary": salary, "house_property": hp_setoff, "business": business, "other_sources": other,
+    total_tax = round_288b(base + surcharge - relief + cess)
+    return {"regime": regime, "salary": salary, "hra_exempt": hra_exempt, "hra": hra if regime == "old" else None,
+            "house_property": hp_setoff, "business": business, "other_sources": other,
             "special_income": special, "deductions": ded, "total_income": total, "tax_normal": money(tax_normal),
             "tax_special": money(special_tax), "rebate_87a": money(rebate), "surcharge": money(surcharge),
-            "marginal_relief": money(relief), "cess": money(cess), "total_tax": total_tax}
+            "marginal_relief": money(relief), "cess": money(cess), "total_tax": total_tax,
+            "basic_exemption": exemption}
+
+
+def individual_due_date(p: dict, fy: str) -> tuple[date, dict]:
+    """s.139(1) due date for an individual/HUF profile, and the year's due-date table."""
+    dd = fy_rules(rules.ITR_DUE_DATES, fy)
+    if p.get("due_date"):
+        return parse_date(p["due_date"]), dd
+    if p.get("tax_audit") or tax_audit_required(p):
+        return dd.get("audit_extended", dd["audit"]), dd
+    if p.get("business_income") or p.get("presumptive"):
+        return dd["non_audit_business"], dd
+    return dd["non_audit"], dd
+
+
+def as_of_date(args) -> date:
+    return parse_date(args.as_of) if getattr(args, "as_of", None) else date.today()
+
+
+def late_position(p: dict, res: dict, due: date, filed: date, fy: str) -> dict:
+    """Interest u/s 234A/B/C and the s.234F fee on one regime's tax for a return filed on `filed`."""
+    tds = money(p.get("tds"))
+    adv = payments(p.get("advance_tax"))
+    sa = payments(p.get("self_assessment_paid"))
+    adv_total = sum((a for d, a in adv if d <= fy_bounds(fy)[1]), ZERO)
+    net = max(ZERO, res["total_tax"] - tds)
+    i234c, _ = interest_234c(net, adv, fy, bool(p.get("presumptive")))
+    i234b = interest_234b(net, adv_total, sa, fy, filed)
+    i234a = interest_234a(net - adv_total - sum((a for d, a in sa if d <= due), ZERO), due, filed)
+    fee = ZERO
+    if filed > due and res["total_income"] > res["basic_exemption"]:
+        lim = rules.LATE_FILING_FEE
+        fee = P(lim["small_income"] if res["total_income"] <= lim["small_income_limit"] else lim["default"])
+    paid = tds + adv_total + sum((a for _, a in sa), ZERO)
+    return {"interest_234a": i234a, "interest_234b": i234b, "interest_234c": i234c, "fee_234f": fee, "paid": paid,
+            "payable": round_288b(res["total_tax"] + i234a + i234b + i234c + fee - paid)}
 
 
 def cmd_individual(args):
     p = load_json(args.input)
+    fy = p.get("fy", "2025-26")
     old, new = individual_tax(p, "old"), individual_tax(p, "new")
-    tds = money(p.get("tds"))
-    adv = sum((a for _, a in payments(p.get("advance_tax"))), ZERO)
-    keys = [("Salary (after standard deduction)", "salary"), ("House property", "house_property"), ("Business/profession", "business"),
+    today = as_of_date(args)
+    due, dd = individual_due_date(p, fy)
+    notes = []
+    if p.get("filing_date"):
+        filed = parse_date(p["filing_date"])
+    elif today > due:
+        filed = today
+        notes.append(f"The due date {due} has passed and no filing_date was given, so the return is taken as filed "
+                     f"today ({today}). Set filing_date in the JSON for another date.")
+    else:
+        filed = due
+        notes.append(f"No filing_date given: the return is taken as filed on the due date {due}.")
+    late = {"old": late_position(p, old, due, filed, fy), "new": late_position(p, new, due, filed, fy)}
+    keys = [("Salary (after standard deduction and exemptions)", "salary"), ("HRA exempt u/s 10(13A), rule 2A", "hra_exempt"),
+            ("House property", "house_property"), ("Business/profession", "business"),
             ("Other sources", "other_sources"), ("Chapter VI-A deductions", "deductions"), ("Total income", "total_income"),
             ("Tax at slab rates", "tax_normal"), ("Tax on special-rate capital gains", "tax_special"), ("Rebate u/s 87A", "rebate_87a"),
-            ("Surcharge", "surcharge"), ("Marginal relief", "marginal_relief"), ("Cess @ 4%", "cess"), ("**Total tax**", "total_tax")]
-    rows = [[lab, old[k], new[k]] for lab, k in keys]
-    rows.append(["Less: TDS + advance tax", tds + adv, tds + adv])
-    rows.append(["**Payable / (refund)**", old["total_tax"] - tds - adv, new["total_tax"] - tds - adv])
-    better = "new" if new["total_tax"] <= old["total_tax"] else "old"
-    saving = abs(old["total_tax"] - new["total_tax"])
-    md = [f"# Income-tax: old vs new regime - {p.get('name', '')} - FY {p.get('fy', '2025-26')}", "",
-          md_table(["Particulars", "Old regime", "New regime (default)"], rows, right={1, 2}), "",
-          f"**Recommended: {better} regime** (saves Rs {inr(saving)}).",
-          "Salaried taxpayers without business income may choose afresh every year in the return. With business income, "
-          "opting out of the new regime needs Form 10-IEA before the due date and switching back is allowed only once."]
+            ("Surcharge", "surcharge"), ("Marginal relief", "marginal_relief"), ("Cess @ 4%", "cess"),
+            ("**Total tax (rounded u/s 288B)**", "total_tax")]
+    rows = [[lab, old[k], new[k]] for lab, k in keys if k != "hra_exempt" or old[k]]
+    rows.append(["Less: TDS, advance tax and self-assessment tax", late["old"]["paid"], late["new"]["paid"]])
+    for lab, k in (("Add: interest u/s 234A", "interest_234a"), ("Add: interest u/s 234B", "interest_234b"),
+                   ("Add: interest u/s 234C", "interest_234c"), ("Add: fee u/s 234F", "fee_234f")):
+        if late["old"][k] or late["new"][k]:
+            rows.append([lab, late["old"][k], late["new"][k]])
+    rows.append(["**Payable / (refund), rounded u/s 288B**", late["old"]["payable"], late["new"]["payable"]])
+    cost = {r: (old if r == "old" else new)["total_tax"] + late[r]["interest_234a"] + late[r]["interest_234b"]
+            + late[r]["interest_234c"] + late[r]["fee_234f"] for r in ("old", "new")}
+    better = "new" if cost["new"] <= cost["old"] else "old"
+    saving = abs(cost["old"] - cost["new"])
+    belated = filed > due
+    has_business = bool(p.get("business_income") or p.get("presumptive"))
+    old_allowed = not belated or bool(has_business and p.get("form_10iea_filed"))
+    md = [f"# Income-tax: old vs new regime - {p.get('name', '')} - FY {fy}",
+          f"Due date u/s 139(1): {due} | Filing date used: {filed}{' (belated return u/s 139(4))' if belated else ''}", "",
+          md_table(["Particulars", "Old regime", "New regime (default)"], rows, right={1, 2}), ""]
+    if old["hra"]:
+        h = old["hra"]
+        md += ["## HRA exemption (s.10(13A), rule 2A): the least of", "",
+               md_table(["Limb", "Rs"], [[k, v] for k, v in h["limbs"].items()]
+                        + [["**Exempt**", h["exempt"]], ["Taxable HRA", h["taxable"]]]), "",
+               "_Salary here means basic + DA (retirement-benefit DA) for the months rent was paid. The exemption is "
+               "available only under the old regime._", ""]
+    if not old_allowed and better == "old":
+        md.append(f"**Recommended: new regime.** The old regime would cost Rs {inr(saving)} less, but a belated return "
+                  "cannot opt out of the new regime: s.115BAC(6) needs the option in a return filed by the s.139(1) due "
+                  f"date{' (and Form 10-IEA by that date, as there is business income)' if has_business else ''}.")
+        better = "new"
+    else:
+        md.append(f"**Recommended: {better} regime** (saves Rs {inr(saving)}, interest and fee included).")
+        if belated and not old_allowed:
+            md.append("The return is belated, so it is locked into the new regime anyway (s.115BAC(6)).")
+    if filed > dd["belated"]:
+        md.append(f"The belated and revised return window closed on {dd['belated']}. Only an updated return (ITR-U, "
+                  "s.139(8A)) is possible: it carries additional tax on top of the tax and interest above, and cannot "
+                  "reduce tax or claim a refund.")
+    md.append("Salaried taxpayers without business income may choose the regime afresh every year in a return filed by "
+              "the due date. With business income, opting out of the new regime needs Form 10-IEA by the due date and "
+              "switching back is allowed only once.")
+    md += [f"\n_{n}_" for n in notes]
     args.report_name = "individual_tax"
-    emit("\n".join(md), {"old": old, "new": new, "recommended": better, "saving": saving}, args)
+    emit("\n".join(md), {"old": old, "new": new, "due_date": due, "filing_date": filed, "belated": belated,
+                         "late": late, "old_regime_available": old_allowed, "recommended": better,
+                         "saving": saving, "notes": notes}, args)
 
 
 # --------------------------------------------------------------------------- ITR form, advance tax, TDS
@@ -573,17 +713,37 @@ def cmd_itr_form(args):
             reasons.append("Resident individual with salary/pension, one house property, other sources, income up to Rs 50 lakh")
     fy = p.get("fy", "2025-26")
     dd = fy_rules(rules.ITR_DUE_DATES, fy)
-    audit = tax_audit_required(p)
-    if et in {"company", "opc"} or audit:
+    audit = tax_audit_required(p) or ("tax_audit is true" if p.get("tax_audit") else None)
+    if p.get("due_date"):
+        due = parse_date(p["due_date"])
+    elif et in {"company", "opc"} or audit:
         due = dd.get("audit_extended", dd["audit"])
-    elif form in {"ITR-3", "ITR-4", "ITR-5"} and (p.get("business_income") or p.get("presumptive")):
+    elif form in {"ITR-3", "ITR-4", "ITR-5"} and (p.get("business_income") or p.get("presumptive") or et in {"firm", "llp", "aop", "boi"}):
         due = dd["non_audit_business"]
     else:
         due = dd["non_audit"]
+    today = as_of_date(args)
     md = [f"# ITR form: {form}", "", *[f"- {r}" for r in reasons],
           f"- Tax audit u/s 44AB: {'required - ' + audit if audit else 'not required on the facts given'}",
           f"- Due date for FY {fy}: {due} (belated/revised: {dd['belated']} / {dd['revised']}; late fee u/s 234F up to Rs 5,000)"]
-    print("\n".join(md))
+    if today > dd["belated"]:
+        status = "window_closed"
+        md += ["", f"**As of {today} the due date ({due}) and the belated-return deadline ({dd['belated']}) have both "
+               "passed.** Only an updated return (ITR-U, s.139(8A)) can be filed, with additional tax; it cannot reduce "
+               "tax or claim a refund."]
+    elif today > due:
+        status = "belated"
+        md += ["", f"**As of {today} the due date {due} has passed.** File a belated return u/s 139(4) by {dd['belated']}, "
+               "with the s.234F fee and interest u/s 234A from the due date. An individual or HUF filing late is locked "
+               "into the new regime (s.115BAC(6)). Losses other than house property loss cannot be carried forward "
+               "(s.80/s.139(3))."]
+    else:
+        status = "on_time"
+        md += [f"- {(due - today).days} day(s) left to the due date as of {today}."]
+    args.report_name = "itr_form"
+    emit("\n".join(md), {"form": form, "reasons": reasons, "tax_audit": audit, "fy": fy, "due_date": due,
+                         "belated_due_date": dd["belated"], "revised_due_date": dd["revised"], "as_of": today,
+                         "status": status}, args)
 
 
 def tax_audit_required(p: dict) -> str | None:
@@ -643,8 +803,10 @@ def main():
     for name, fn in (("company", cmd_company), ("individual", cmd_individual), ("itr-form", cmd_itr_form)):
         s = sub.add_parser(name)
         s.add_argument("input")
-        s.add_argument("--out-dir")
-        s.add_argument("--json", action="store_true")
+        s.add_argument("--out-dir", help="also write <report>.md and <report>.json here")
+        s.add_argument("--json", action="store_true", help="print JSON instead of markdown")
+        if name != "company":
+            s.add_argument("--as-of", help="today's date for the due-date check (default: the system date)")
         s.set_defaults(func=fn)
     s = sub.add_parser("advance-tax")
     s.add_argument("--tax", required=True)

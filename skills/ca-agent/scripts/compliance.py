@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 """Statutory compliance calendar for an entity (GST, TDS/TCS, advance tax, ITR, tax audit, ROC/MCA, PF/ESI).
 
-    compliance.py <folder> [--from 2026-10-17] [--days 60] [--fy 2026-27] [--ics calendar.ics] [--json]
+    compliance.py <folder> [--from 2026-10-17] [--days 60] [--lookback 180] [--fy 2026-27] [--ics calendar.ics] [--json]
 
 Uses company.json: entity_type, gst_filing (monthly/qrmp/composition/none), state_code,
 tds_applicable (default true), pf_esi_registered, tax_audit (true/false), agm_date, aato_previous_fy.
 Without --from it lists the whole financial year (and the year-end filings that fall after it).
+With --from it lists what falls due in the --days window and, first, everything that fell due in the
+--lookback days before it as "overdue unless done": the books cannot show what was filed, so confirm
+each item and give the late position for any that was missed. Events are built for the books' FY, the
+FY containing --from, and the year before each, so old books still show current dues.
 Statutory dates only: check CBDT/CBIC/MCA for extensions before relying on a date (rules.py records
 the extensions known when it was last verified).
 """
@@ -15,7 +19,7 @@ import argparse
 from datetime import date, datetime, timedelta, timezone
 
 import rules
-from common import Books, D, emit, fy_bounds, md_table, parse_date, run_cli, state_code_of
+from common import Books, D, emit, fy_bounds, fy_of, md_table, parse_date, run_cli, state_code_of
 
 
 def add_months(d: date, n: int) -> date:
@@ -114,6 +118,8 @@ def main():
     ap.add_argument("--fy", help="defaults to the books' FY")
     ap.add_argument("--from", dest="from_date", help="list only dates on/after this day")
     ap.add_argument("--days", type=int, default=60, help="window length with --from")
+    ap.add_argument("--lookback", type=int, default=180,
+                    help="with --from: days before it to list as 'overdue unless done' (default 180)")
     ap.add_argument("--ics", help="also write an .ics calendar file")
     ap.add_argument("--out-dir")
     ap.add_argument("--json", action="store_true")
@@ -122,30 +128,51 @@ def main():
     books = Books(args.folder)
     fy = args.fy or books.fy
     events = events_for(books, fy)
+    overdue = []
     if args.from_date:
-        # Year-end filings of the previous FY (ITR, AOC-4, GSTR-9 ...) fall inside the current FY.
-        y = int(fy[:4])
-        events = sorted(events_for(books, f"{y - 1}-{str(y)[2:]}") + events, key=lambda e: e["date"])
+        # Year-end filings of the previous FY (ITR, AOC-4, GSTR-9 ...) fall inside the current FY, and the
+        # window may lie in a later FY than the books.
         lo = parse_date(args.from_date)
+        fys = set()
+        for f in (fy, fy_of(lo)):
+            y = int(f[:4])
+            fys |= {f, f"{y - 1}-{str(y)[2:]}"}
+        events = sorted((e for f in sorted(fys) for e in events_for(books, f)), key=lambda e: e["date"])
         hi = lo + timedelta(days=args.days)
+        overdue = dedupe([dict(e, overdue_days=(lo - e["date"]).days) for e in events
+                          if lo - timedelta(days=args.lookback) <= e["date"] < lo])
         events = [e for e in events if lo <= e["date"] <= hi]
-    seen, unique = set(), []
-    for e in events:
-        k = (e["date"], e["item"], e["period"])
-        if k not in seen:
-            seen.add(k)
-            unique.append(e)
+    unique = dedupe(events)
     rows = [[e["date"].strftime("%d %b %Y (%a)"), e["area"], e["item"], e["period"], e["note"]] for e in unique]
     title = f"Compliance calendar - {books.company.get('name')}"
     title += f" - {args.from_date} + {args.days} days" if args.from_date else f" - FY {fy}"
-    md = "\n".join([f"# {title}", "", md_table(["Due date", "Area", "Compliance", "Period", "Note"], rows), "",
+    head = [f"# {title}", ""]
+    if overdue:
+        head += [f"## Overdue unless done (due in the {args.lookback} days before {args.from_date})", "",
+                 "The books cannot show whether these were filed. Confirm each one; for any missed, give the late "
+                 "position (GST: s.50 interest and late fee; TDS: s.234E fee and s.201(1A) interest; ITR: belated "
+                 "return, s.234A/234F; ROC: additional fees, and an AGM not held is itself a default).", "",
+                 md_table(["Due date", "Days overdue", "Area", "Compliance", "Period", "Note"],
+                          [[e["date"].strftime("%d %b %Y"), e["overdue_days"], e["area"], e["item"], e["period"],
+                            e["note"]] for e in overdue]), "", "## Coming up", ""]
+    md = "\n".join([*head, md_table(["Due date", "Area", "Compliance", "Period", "Note"], rows), "",
                     f"Statutory dates as recorded in rules.py (verified {rules.VERIFIED_ON}); a date falling on a holiday is "
                     "not automatically extended - check notifications for extensions. Professional tax and state labour "
                     "returns vary by state and are not listed."])
     if args.ics:
         write_ics(unique, args.ics, books.company.get("name", "Entity"))
         md += f"\n\nCalendar file written to {args.ics}"
-    emit(md, {"events": unique}, args)
+    emit(md, {"events": unique, "overdue_unless_done": overdue}, args)
+
+
+def dedupe(events: list[dict]) -> list[dict]:
+    seen, unique = set(), []
+    for e in events:
+        k = (e["date"], e["item"], e["period"])
+        if k not in seen:
+            seen.add(k)
+            unique.append(e)
+    return unique
 
 
 if __name__ == "__main__":

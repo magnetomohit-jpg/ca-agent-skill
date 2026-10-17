@@ -20,7 +20,7 @@ import json
 import re
 import sys
 from datetime import date, datetime, timedelta
-from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
+from decimal import ROUND_DOWN, ROUND_HALF_UP, Decimal, InvalidOperation
 from pathlib import Path
 
 ZERO = Decimal("0")
@@ -90,6 +90,14 @@ def round_to_10(value) -> Decimal:
     """Total income is rounded off to the nearest multiple of ten rupees (sec 288A / 1961 Act)."""
     v = D(value)
     return (v / 10).quantize(Decimal("1"), rounding=ROUND_HALF_UP) * 10
+
+
+def round_288b(value) -> Decimal:
+    """Tax, interest, fee and refund u/s 288B: ignore the paise, then round to the nearest Rs 10 (a last digit of 5 goes up)."""
+    v = D(value)
+    whole = abs(v).quantize(Decimal("1"), rounding=ROUND_DOWN)
+    out = (whole / 10).quantize(Decimal("1"), rounding=ROUND_HALF_UP) * 10
+    return -out if v < 0 else out
 
 
 def inr(value, decimals: int = 2, blank_zero: bool = False) -> str:
@@ -268,8 +276,9 @@ def md_table(headers: list[str], rows: list[list], right: set[int] | None = None
     return "\n".join(lines)
 
 
-def write_xlsx(path: Path | str, sheets: list[tuple[str, list[list]]]) -> bool:
-    """Write simple sheets (first row bold). Returns False when openpyxl is not installed."""
+def write_xlsx(path: Path | str, sheets: list[tuple[str, list[list]]], heading: list[str] | None = None) -> bool:
+    """Write simple sheets (first table row bold). `heading` lines (entity name, CIN ...) go above every sheet's
+    table, followed by the sheet name as its title. Returns False when openpyxl is not installed."""
     try:
         from openpyxl import Workbook
         from openpyxl.styles import Font
@@ -281,14 +290,19 @@ def write_xlsx(path: Path | str, sheets: list[tuple[str, list[list]]]) -> bool:
     for name, rows in sheets:
         ws = wb.create_sheet(title=re.sub(r"[\\/*?:\[\]]", "-", name)[:31])
         widths: dict[int, int] = {}
-        for r_idx, row in enumerate(rows, start=1):
+        top = 0
+        if heading:
+            for i, text in enumerate([*heading, name], start=1):
+                ws.cell(row=i, column=1, value=text).font = Font(bold=True, size=13 if i == 1 else 11)
+            top = len(heading) + 2
+        for r_idx, row in enumerate(rows, start=1 + top):
             for c_idx, val in enumerate(row, start=1):
                 if isinstance(val, Decimal):
                     val = float(money(val))
                 cell = ws.cell(row=r_idx, column=c_idx, value=val)
                 if isinstance(val, float):
                     cell.number_format = "#,##,##0.00;(#,##,##0.00);-"
-                if r_idx == 1 or (isinstance(row[0], str) and row[0].isupper() and len(row[0]) > 3):
+                if r_idx == 1 + top or (isinstance(row[0], str) and row[0].isupper() and len(row[0]) > 3):
                     cell.font = Font(bold=True)
                 widths[c_idx] = max(widths.get(c_idx, 8), min(len(str(val)) + 2, 70))
         for c_idx, w in widths.items():

@@ -72,8 +72,8 @@ Each prints a markdown report. `--json` gives machine-readable output, and `--ou
 `.md`/`.json` (and `.xlsx` for the financial statements) for the user. Write deliverables to
 `<books>/reports/` and scratch files (voucher JSON, tax inputs) to `<books>/working/`. An individual's
 tax question has no books folder: keep the input JSON and the outputs together in one working folder.
-The table below plus `python <script> --help` (the script's docstring and flags; for gst.py one call
-covers every subcommand) is the full interface, and the workflows note what each command does not do,
+The table below plus `python <script> --help` (the script's docstring and flags; `gst.py <command> --help`
+and `income_tax.py <command> --help` for one subcommand) is the full interface, and the workflows note what each command does not do,
 so there is no need to read the source. On Windows, give Python native paths (`F:\...`), even from Git Bash.
 
 | Task | Command |
@@ -130,9 +130,10 @@ accounts, dates outside the year and negative cash. Nothing downstream is reliab
    HSN (B2B and B2C tabs) and documents-issued tables, matching the portal tiles.
 3. `gst.py reco ... --gstr2b 2b.csv` checks ITC. It can be claimed only if the invoice appears in GSTR-2B
    (sec 16(2)(aa)). Act on each bucket: chase the supplier, accept or reject in IMS, or book the missing bill.
-   The reco matches invoices only and does not judge eligibility. A bill blocked under 17(5) still shows as
-   "Matched" (gstr3b reverses it in 4(B)(1)), and RCM lines are left out because they never appear in 2B.
-   Remember both when you explain how the 2B figure becomes net ITC.
+   Matching ignores eligibility, so a bill blocked under 17(5) can be "Matched"; the Eligible ITC column shows
+   what it really gives. The report ends with a bridge from the 2B total to the 4(C) net ITC that gstr3b will
+   compute, including RCM, import and ISD credit that never appears in 2B. 4(C) takes the register figure: if
+   the bridge shows eligible ITC on bills not yet in 2B, pass those amounts to gstr3b as `--reverse-other`.
    `references/gst.md` explains how to turn the portal's GSTR-2B Excel into the CSV.
 4. `gst.py gstr3b ... --credit-bf igst=..,cgst=..,sgst=..` (credit ledger balance carried in)
    [`--reverse-42-43`, `--reverse-other`, `--filing-date` for interest and late fee]. It returns tables
@@ -162,14 +163,17 @@ list as a review. Rerun each script to verify the posted figure, and post only c
 6. Income tax (Workflow 4), then post Current Tax against Provision for Income Tax. Deferred tax is the
    closing DTA/DTL from `depreciation.py` less the opening balance.
 7. Run `financials.py --out-dir <dir>/reports` and read its "Checks before finalising" section. Those
-   checks look for missing year-end entries, an uncleared Suspense and tally errors. They do not look at
-   statutory dues still unpaid at 31 March (GST and RCM payable, TDS, PF/ESI) or how old the MSME
-   creditors are, so review those yourself.
+   checks cover missing year-end entries, an uncleared Suspense, tally errors, statutory dues unpaid at
+   31 March (GST net of input credit, RCM, TDS, PF/ESI/bonus) and MSME bills over 45 days old. Confirm
+   each unpaid due was paid by its due date (it feeds s.43B and s.40(a)(ia) in Workflow 4). The report
+   also has a PPE movement table, the MSME bills with their age, and a tax and deferred tax summary;
+   the xlsx carries the same as extra sheets under the entity heading.
    - Explain every ratio that moved more than 25% (Schedule III requires it). Without `--prev-books`
      there are no comparatives, so ask for last year's audited figures and list this as an open item.
    - Cash flow statements are not required for small companies, OPCs and dormant companies (sec 2(40)).
-     The script does not decide small-company status (sec 2(85)), so check it and say so, rather than
-     silently omitting the statement.
+     The report runs the sec 2(85) capital and turnover test. It cannot see whether the company is
+     public, a holding or subsidiary company or a s.8 company, so confirm those before omitting the
+     statement, and say which way you went.
 8. Complete the disclosures the script cannot know about: share capital details and promoter
    shareholding, ageing of receivables, payables and CWIP, related parties (AS 18), contingent liabilities,
    MSME dues, CSR, and the Schedule III additional regulatory information. See
@@ -185,8 +189,8 @@ list as a review. Rerun each script to verify the posted figure, and post only c
    cash payments over Rs 10,000 for s.40A(3).
 2. Work through the draft's `todo` list with the user. The usual items are s.43B unpaid statutory dues,
    40(a)(ia) TDS defaults, 36(1)(va) late PF/ESI, related-party payments and brought-forward losses.
-   s.43B(h) needs its own look, because the draft does not list the amounts:
-   - Take the MSME-tagged creditors open at 31 March, with their invoice dates.
+   For s.43B(h) the draft lists the MSME-tagged bills open at 31 March (`msme_dues_at_year_end`, oldest
+   first, payments assumed to clear the oldest bills) with their age and 15/45-day pay-by dates:
    - The rule covers micro and small manufacturers and service providers, not traders.
    - The expense stays deductible this year only if it is paid within the MSMED Act s.15 period: 15 days,
      or the agreed credit term up to 45 days. That date can fall after 31 March. Otherwise the expense is
@@ -206,17 +210,19 @@ list as a review. Rerun each script to verify the posted figure, and post only c
 
 **Individuals, HUFs and firms:** write a small JSON (format in `references/income-tax.md`), run
 `individual` for the old vs new regime comparison and `itr-form` for the form, tax-audit applicability and
-due date. For advance tax use `advance-tax --tax <estimate> --fy <year>`. Know what these commands leave to you:
-- `individual` takes exemptions and deductions as given. Work out HRA first (rule 2A). "Salary" here
-  means basic plus DA. The exemption is the least of three amounts:
-  - HRA received;
-  - rent paid less 10% of salary;
-  - 50% of salary in a metro, 40% elsewhere (for FY 2025-26 the metros are Delhi, Mumbai, Kolkata
-    and Chennai).
-  If basic salary is unknown, assume one, say so, and show how the answer changes with it.
-- `individual` has no filing date. For a late return, add s.234A interest and the s.234F fee yourself.
-- `itr-form` prints to the screen only and ignores `--out-dir`, so save its output yourself if the user
-  needs a file. It does not compare the due date with today, so do that check yourself.
+due date. For advance tax use `advance-tax --tax <estimate> --fy <year>`. Know what these commands do and leave to you:
+- HRA: put `salary.hra` = `{received, rent_paid, basic_da, city}` (or `metro: true/false`) in the JSON and
+  `individual` applies rule 2A (old regime only) and shows the three limbs. "Salary" there means basic plus
+  DA. If basic salary is unknown, assume one, say so, and show how the answer changes with it. Other
+  exemptions and deductions are taken as given, so test them against their limits first.
+- Late returns: set `filing_date`. Without it the return is taken as filed on the due date, or today
+  if the due date has passed. `individual` then adds s.234A/B/C interest and the s.234F fee. For a belated
+  return it recommends the new regime, because s.115BAC(6) bars opting out late (set `form_10iea_filed`
+  if a business taxpayer filed Form 10-IEA in time).
+- `itr-form` honours `--out-dir`/`--json` and compares the due date with today (`--as-of` to override):
+  on time, belated (by 31 December), or window closed (ITR-U only).
+- Tax, interest, fees and balances are rounded to Rs 10 (s.288B) by `individual` and `company`, so quote
+  the rounded figures.
 
 **TDS:** `income_tax.py tds-rates` lists the sections and thresholds. Deduct at payment or credit,
 whichever is earlier, deposit by the 7th, and file quarterly returns.
@@ -225,8 +231,11 @@ whichever is earlier, deposit by the 7th, and file quarterly returns.
 
 `compliance.py <dir> --from <today> --days 60` lists what is due across GST, TDS, advance tax,
 ITR and tax audit, ROC (AGM, AOC-4, MGT-7, DPT-3, MSME-1, DIR-3 KYC) and PF/ESI, based on the
-entity's profile. `--ics` writes a calendar file the user can import. Lead with overdue and
-next-7-days items. Note that holidays do not move statutory dates automatically.
+entity's profile. `--ics` writes a calendar file the user can import. With `--from` it first lists what
+fell due in the previous `--lookback` days (default 180) as "overdue unless done". The books cannot show
+what was filed, so ask about each one and give the late position for any that was missed. An AGM counts
+as held only when company.json has `agm_date`. Lead with overdue and next-7-days items. Note that holidays
+do not move statutory dates automatically.
 
 ## How to report back
 

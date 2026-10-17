@@ -4,8 +4,14 @@
     financials.py <folder> [--as-of 2026-03-31] [--prev-books <last-year-folder>] [--out-dir out/] [--json]
 
 Produces: Balance Sheet, Statement of Profit and Loss, Cash Flow Statement (indirect method, AS 3),
-account-level notes, Schedule III ratios with >25% variance flags, and pre-closing checks.
-With --out-dir it also writes financial_statements.md / .json / .xlsx.
+account-level notes, a PPE/intangibles movement table, MSME dues with bill age, a tax and deferred tax
+summary, Schedule III ratios with >25% variance flags, a small-company (s.2(85)) test and pre-closing
+checks. The checks cover missing year-end entries, Suspense, tally errors, statutory dues unpaid at the
+year end (GST net of input credit, RCM, TDS, PF/ESI/bonus) and MSME bills older than 45 days.
+With --out-dir it also writes financial_statements.md / .json / .xlsx (every sheet headed with the
+entity name and CIN; PPE reconciliation, Tax and MSME dues sheets included).
+The small-company test uses --prev-books revenue, else turnover_previous_fy or aato_previous_fy in
+company.json, else this year's revenue.
 
 Comparatives: last year's balance sheet comes from this year's 'Opening' vouchers; last year's
 P&L needs --prev-books. P&L accounts must not be closed into reserves inside the year (books.py
@@ -14,10 +20,13 @@ close-year does that when opening the next year), so the current profit is the P
 from __future__ import annotations
 
 import argparse
+from datetime import timedelta
 from decimal import Decimal
 from pathlib import Path
 
-from common import (LINES, ZERO, Books, BooksError, D, emit, inr, md_table, money, parse_date, run_cli,
+import rules
+
+from common import (LINES, ZERO, Books, BooksError, D, emit, inr, load_json, md_table, money, parse_date, run_cli,
                     write_xlsx)
 
 BS_LAYOUT = [
@@ -75,12 +84,19 @@ def compute(books: Books, bal: dict) -> dict:
         lines[line] += amt
         detail[line].append((name, amt))
     net_dta = lines["deferred_tax_asset"] - lines["deferred_tax_liab"]
-    dt_detail = detail["deferred_tax_asset"] + [(n, -a) for n, a in detail["deferred_tax_liab"]]
     lines["deferred_tax_asset"], lines["deferred_tax_liab"] = (net_dta, ZERO) if net_dta >= 0 else (ZERO, -net_dta)
+    # Net DTA/DTL (AS 22 para 29). An account whose balance lands on the other side is labelled so the note
+    # does not show "Deferred Tax Liability" under the asset heading without explanation.
     if net_dta >= 0:
-        detail["deferred_tax_asset"], detail["deferred_tax_liab"] = dt_detail, []
+        detail["deferred_tax_asset"] = detail["deferred_tax_asset"] + [
+            (f"{n} (debit balance, shown as a deferred tax asset)" if a < 0 else f"Less: {n}", -a)
+            for n, a in detail["deferred_tax_liab"]]
+        detail["deferred_tax_liab"] = []
     else:
-        detail["deferred_tax_liab"], detail["deferred_tax_asset"] = [(n, -a) for n, a in dt_detail], []
+        detail["deferred_tax_liab"] = detail["deferred_tax_liab"] + [
+            (f"{n} (credit balance, shown as a deferred tax liability)" if a < 0 else f"Less: {n}", -a)
+            for n, a in detail["deferred_tax_asset"]]
+        detail["deferred_tax_asset"] = []
 
     pl = {"revenue": lines["revenue_operations"], "other_income": lines["other_income"]}
     pl["total_income"] = pl["revenue"] + pl["other_income"]
@@ -225,7 +241,150 @@ def ratios(cur: dict, prev: dict | None) -> list[dict]:
     return rows
 
 
-def checks(books: Books, cur: dict, closing: dict) -> list[str]:
+def msme_open_items(books: Books, as_of) -> list[dict]:
+    """Open bills of MSME-tagged creditors at `as_of`, oldest first. Payments are taken to clear the oldest bills
+    (FIFO), so the closing credit balance is made up of the latest credits. The MSMED Act s.15 limit is 15 days
+    from acceptance, or the agreed credit term up to 45 days; `pay_by_45` assumes the longest term."""
+    items = []
+    for acc in books.accounts_with_tag("msme"):
+        name = acc["account"]
+        credits = [ln for ln in books.journal
+                   if ln["account"].lower() == name.lower() and ln["date"] <= as_of and ln["credit"]]
+        balance = -sum((ln["debit"] - ln["credit"] for ln in books.journal
+                        if ln["account"].lower() == name.lower() and ln["date"] <= as_of), ZERO)
+        left, open_ = balance, []
+        for ln in sorted(credits, key=lambda x: x["date"], reverse=True):
+            if left <= 0:
+                break
+            amt = min(left, ln["credit"])
+            left -= amt
+            opening = ln["voucher_type"].lower() == "opening"
+            open_.append({"supplier": name, "ref": "opening balance" if opening else (ln.get("ref") or ln.get("voucher_no")),
+                          "date": None if opening else ln["date"], "amount": amt,
+                          "age_days": None if opening else (as_of - ln["date"]).days,
+                          "pay_by_15": None if opening else ln["date"] + timedelta(days=15),
+                          "pay_by_45": None if opening else ln["date"] + timedelta(days=45)})
+        items += reversed(open_)
+    return items
+
+
+def statutory_dues(books: Books, closing: dict) -> list[str]:
+    """Statutory liabilities still unpaid in the closing balances (GST net of input credit, RCM, TDS, PF/ESI/bonus)."""
+    msgs = []
+
+    def total(tags):
+        return -sum((closing.get(a["account"], ZERO) for t in tags for a in books.accounts_with_tag(t)), ZERO)
+
+    heads = ("igst", "cgst", "sgst")
+    gst_net = total([f"gst_output_{h}" for h in heads] + [f"gst_input_{h}" for h in heads])
+    if gst_net > 0:
+        msgs.append(f"GST payable at year end: output tax exceeds input credit by {inr(gst_net)} - confirm it was paid "
+                    "with the March GSTR-3B (due 20 April); unpaid GST is disallowed u/s 43B until paid")
+    rcm = total([f"gst_rcm_{h}" for h in heads])
+    if rcm > 0:
+        msgs.append(f"Reverse-charge GST payable at year end {inr(rcm)} - payable in cash with the March GSTR-3B "
+                    "(due 20 April); the input credit is available only after payment")
+    tds = total(["tds_payable"])
+    if tds > 0:
+        msgs.append(f"TDS payable at year end {inr(tds)} - deposit by 30 April; if deposited after the ITR due date, "
+                    "30% of the expense is disallowed u/s 40(a)(ia) and interest u/s 201(1A) applies")
+    other = total(["statutory_43b"])
+    if other > 0:
+        msgs.append(f"PF/ESI/bonus/other statutory dues payable at year end {inr(other)} - s.43B allows them only if "
+                    "paid by the ITR due date; employees' PF/ESI deposited after the statutory due date is disallowed "
+                    "for good u/s 36(1)(va)")
+    return msgs
+
+
+def small_company_status(books: Books, cur: dict, prev: dict | None, has_prev_pl: bool) -> tuple[bool | None, str]:
+    """Section 2(85) test on paid-up capital and the previous year's turnover. Returns (likely small, explanation)."""
+    co = books.company
+    if (co.get("entity_type") or "company").lower() not in {"company", "opc"}:
+        return None, ""
+    lim = rules.SMALL_COMPANY
+    capital = cur["bs"]["share_capital"]
+    if has_prev_pl and prev:
+        turnover, src = prev["pl"]["revenue"], "previous year's revenue from --prev-books"
+    elif co.get("turnover_previous_fy") is not None:
+        turnover, src = D(co["turnover_previous_fy"]), "turnover_previous_fy in company.json"
+    elif co.get("aato_previous_fy") is not None:
+        turnover, src = D(co["aato_previous_fy"]), "aato_previous_fy (GST turnover) in company.json"
+    else:
+        turnover, src = cur["pl"]["revenue"], "this year's revenue (no previous-year figure given)"
+    small = capital <= lim["paid_up_capital"] and turnover <= lim["turnover"]
+    text = (f"Small company test (s.2(85)): paid-up capital {inr(capital)} (limit {inr(lim['paid_up_capital'], 0)}), "
+            f"turnover {inr(turnover)} from {src} (limit {inr(lim['turnover'], 0)}): "
+            + ("within both limits, so it is a small company unless it is a public company, a holding or subsidiary "
+               "company, a s.8 company or governed by a special Act. A small company need not include the cash flow "
+               "statement (s.2(40)); it is still shown here." if small else
+               "outside the limits, so it is not a small company and the cash flow statement is required."))
+    return small, text
+
+
+def ppe_reconciliation(books: Books, as_of) -> list[list]:
+    """Gross block and accumulated depreciation movement per account (PPE and intangibles), from the journal."""
+    rows, totals = [], {}
+    for acc in sorted(books.accounts.values(), key=lambda a: (a["line"], "accumulated_depreciation" in a["tags"], a["account"])):
+        if acc["line"] not in ("ppe", "intangible_assets"):
+            continue
+        contra = "accumulated_depreciation" in acc["tags"]
+        lns = [ln for ln in books.journal if ln["account"].lower() == acc["account"].lower() and ln["date"] <= as_of]
+        if not lns:
+            continue
+        sign = -1 if contra else 1   # accumulated depreciation is shown as a positive figure
+        opening = sign * sum((ln["debit"] - ln["credit"] for ln in lns if ln["voucher_type"].lower() == "opening"), ZERO)
+        dr = sum((ln["debit"] for ln in lns if ln["voucher_type"].lower() != "opening"), ZERO)
+        cr = sum((ln["credit"] for ln in lns if ln["voucher_type"].lower() != "opening"), ZERO)
+        add, ded = (cr, dr) if contra else (dr, cr)
+        closing = opening + add - ded
+        kind = "Accumulated depreciation" if contra else "Gross block"
+        rows.append([LINES[acc["line"]][2], kind, acc["account"], opening, add, ded, closing])
+        t = totals.setdefault((acc["line"], kind), [ZERO] * 4)
+        for i, v in enumerate((opening, add, ded, closing)):
+            t[i] += v
+    for line in ("ppe", "intangible_assets"):
+        g = totals.get((line, "Gross block"), [ZERO] * 4)
+        a = totals.get((line, "Accumulated depreciation"), [ZERO] * 4)
+        if any(g) or any(a):
+            rows.append([LINES[line][2], "Net block", "", g[0] - a[0], "", "", g[3] - a[3]])
+    return rows
+
+
+def tax_summary(books: Books, cur: dict, opening: dict, closing: dict) -> list[list]:
+    """Tax expense, provision against taxes paid, and the deferred tax movement; adds the income-tax computation
+    from <books>/working/tax_computation.json when income_tax.py company has written one."""
+    pl = cur["pl"]
+
+    def bal(src, tag):
+        return sum((src.get(a["account"], ZERO) for a in books.accounts_with_tag(tag)), ZERO)
+
+    def dt_net(src):  # positive = net liability
+        return -sum((src.get(a["account"], ZERO) for a in books.accounts.values()
+                     if a["line"] in ("deferred_tax_liab", "deferred_tax_asset")), ZERO)
+
+    tax_exp = pl["current_tax"] + pl["deferred_tax"]
+    rows = [["Profit before tax", pl["pbt"]], ["Current tax", pl["current_tax"]], ["Deferred tax", pl["deferred_tax"]],
+            ["Total tax expense", tax_exp],
+            ["Effective tax rate (%)", money(tax_exp * 100 / pl["pbt"]) if pl["pbt"] else ""], ["", ""],
+            ["Provision for income tax (closing)", -bal(closing, "tax_provision")],
+            ["Less: advance tax, TDS/TCS and self-assessment tax (closing)", bal(closing, "tax_asset")],
+            ["Net tax payable / (refundable)", -bal(closing, "tax_provision") - bal(closing, "tax_asset")], ["", ""],
+            ["Deferred tax liability / (asset), opening", dt_net(opening)],
+            ["Charge / (credit) to profit and loss", pl["deferred_tax"]],
+            ["Deferred tax liability / (asset), closing", dt_net(closing)]]
+    comp_path = books.dir / "working" / "tax_computation.json"
+    if comp_path.exists():
+        comp = load_json(comp_path)
+        rows += [["", ""], ["Income-tax computation (working/tax_computation.json)", ""],
+                 ["Total income", D(comp.get("total_income"))], ["Tax liability", D(comp.get("liability"))],
+                 ["Interest u/s 234A/B/C", D(comp.get("interest_234a")) + D(comp.get("interest_234b")) + D(comp.get("interest_234c"))],
+                 ["Balance payable / (refund)", D(comp.get("balance_payable"))]]
+        if D(comp.get("liability")) != pl["current_tax"]:
+            rows.append(["Difference: current tax booked less computed liability", pl["current_tax"] - D(comp.get("liability"))])
+    return rows
+
+
+def checks(books: Books, cur: dict, closing: dict, as_of) -> list[str]:
     msgs = list(cur["warnings"])
     pl, lines = cur["pl"], cur["lines"]
     if pl["pbt"] > 0 and pl["current_tax"] == 0:
@@ -242,6 +401,15 @@ def checks(books: Books, cur: dict, closing: dict) -> list[str]:
     for acc in books.accounts_with_tag("suspense"):
         if closing.get(acc["account"], ZERO):
             msgs.append(f"Suspense account {acc['account']} is not cleared")
+    msgs += statutory_dues(books, closing)
+    for it in msme_open_items(books, as_of):
+        if it["date"] is None:
+            msgs.append(f"MSME creditor {it['supplier']}: {inr(it['amount'])} brought forward from last year is still "
+                        "unpaid - over 45 days old (MSMED Act s.16 interest, MSME-1, s.43B(h) in the year of payment)")
+        elif it["age_days"] > 45:
+            msgs.append(f"MSME creditor {it['supplier']}: {inr(it['amount'])} ({it['ref']}, {it['date']}) is "
+                        f"{it['age_days']} days old at year end - beyond the 45-day limit: disallowed u/s 43B(h) this "
+                        "year, MSMED Act s.16 interest and MSME-1 reporting apply")
     if cur["eq_liab"] != cur["assets"]:
         msgs.append(f"BALANCE SHEET DOES NOT TALLY: difference {inr(cur['eq_liab'] - cur['assets'])}")
     return msgs
@@ -249,7 +417,8 @@ def checks(books: Books, cur: dict, closing: dict) -> list[str]:
 
 # --------------------------------------------------------------------------- rendering
 
-def render(books: Books, cur: dict, prev: dict | None, cf: dict, ratio_rows: list, msgs: list, as_of, has_prev_pl: bool):
+def render(books: Books, cur: dict, prev: dict | None, cf: dict, ratio_rows: list, msgs: list, as_of, has_prev_pl: bool,
+           extra: dict):
     co = books.company
     yr = as_of.strftime("%d-%m-%Y")
     pyr = f"31-03-{as_of.year - 1}" if as_of.month == 3 and as_of.day == 31 else "Previous"
@@ -362,6 +531,19 @@ def render(books: Books, cur: dict, prev: dict | None, cf: dict, ratio_rows: lis
         rows.append(["**Total**", total, (prev["bs"].get(key, prev["lines"].get(key, ZERO)) if prev else "")])
         md += [f"**Note {no} - {LINES[key][2]}**", "", md_table(["Particulars", yr, pyr], rows, right={1, 2}), ""]
 
+    ppe = extra["ppe"]
+    if ppe:
+        md += ["**PPE and intangible assets - movement in the year** (gross block and accumulated depreciation from the "
+               "journal; add the Schedule III ageing of CWIP and any revaluation by hand)", "",
+               md_table(["Line", "Block", "Account", "Opening", "Additions / charge", "Disposals / on disposals", "Closing"],
+                        ppe, right={3, 4, 5, 6}), ""]
+    if extra["msme"]:
+        md += ["**Dues to micro and small enterprises at year end** (oldest bills first; payments assumed to clear the "
+               "oldest bills; s.43B(h) and MSMED Act s.15/16)", "",
+               md_table(["Supplier", "Bill / ref", "Date", "Amount", "Age (days)", "Pay by (15 days)", "Pay by (45 days)"],
+                        [[i["supplier"], i["ref"], i["date"] or "b/f", i["amount"], "" if i["age_days"] is None else i["age_days"],
+                          i["pay_by_15"] or "", i["pay_by_45"] or ""] for i in extra["msme"]]), ""]
+    md += ["## Income tax and deferred tax", "", md_table(["Particulars", yr], extra["tax"], right={1}), ""]
     md += ["## Ratios (Schedule III additional regulatory information)", ""]
     rr = [[r["ratio"], "" if r["current"] is None else f"{r['current']}", "" if r["previous"] is None else f"{r['previous']}",
            "" if r["variance_pct"] is None else f"{r['variance_pct']}%", "explain (>25%)" if r["explain"] else ""] for r in ratio_rows]
@@ -369,11 +551,23 @@ def render(books: Books, cur: dict, prev: dict | None, cf: dict, ratio_rows: lis
            "Debt service coverage ratio needs principal repayments - compute separately if the company has term debt.", ""]
     md += ["## Checks before finalising", ""]
     md += [f"- {m}" for m in (msgs + cur["notes"])] or ["- No issues found"]
+    if extra["small_company"]:
+        md += ["", extra["small_company"]]
     md += ["", "_Draft prepared from the books. Review classifications, provisions, contingent liabilities, related-party "
            "and MSME disclosures, and Schedule III additional regulatory information before approval and audit._"]
     sheets = [("Balance Sheet", xl_bs), ("Profit and Loss", xl_pl), ("Cash Flow", xl_cf), ("Notes", xl_notes),
               ("Ratios", [["Ratio", "Current", "Previous", "Variance %"]] +
                [[r["ratio"], r["current"], r["previous"], r["variance_pct"]] for r in ratio_rows])]
+    if ppe:
+        sheets.insert(4, ("PPE reconciliation", [["Line", "Block", "Account", "Opening", "Additions / charge",
+                                                  "Disposals / on disposals", "Closing"]] + ppe))
+    sheets.append(("Tax", [["Particulars", yr]] + extra["tax"]))
+    if extra["msme"]:
+        sheets.append(("MSME dues", [["Supplier", "Bill / ref", "Date", "Amount", "Age (days)", "Pay by (15 days)",
+                                      "Pay by (45 days)"]] +
+                       [[i["supplier"], i["ref"], i["date"].isoformat() if i["date"] else "b/f", i["amount"],
+                         i["age_days"], i["pay_by_15"].isoformat() if i["pay_by_15"] else "",
+                         i["pay_by_45"].isoformat() if i["pay_by_45"] else ""] for i in extra["msme"]]))
     return "\n".join(md), sheets
 
 
@@ -401,17 +595,24 @@ def main():
         prev = compute(books, opening) if opening else None
     cf = cash_flow(books, opening, closing, cur)
     ratio_rows = ratios(cur, prev if has_prev_pl or prev else None)
-    msgs = checks(books, cur, closing)
+    msgs = checks(books, cur, closing, as_of)
     if cf["difference"]:
         msgs.append(f"Cash flow does not reconcile by {inr(cf['difference'])} - check account line mapping")
-    markdown, sheets = render(books, cur, prev, cf, ratio_rows, msgs, as_of, has_prev_pl)
+    small, small_text = small_company_status(books, cur, prev, has_prev_pl)
+    extra = {"ppe": ppe_reconciliation(books, as_of), "tax": tax_summary(books, cur, opening, closing),
+             "msme": msme_open_items(books, as_of), "small_company": small_text}
+    markdown, sheets = render(books, cur, prev, cf, ratio_rows, msgs, as_of, has_prev_pl, extra)
     data = {"company": books.company.get("name"), "fy": books.fy, "as_of": as_of,
             "balance_sheet": cur["bs"], "total_assets": cur["assets"], "total_equity_liabilities": cur["eq_liab"],
             "profit_and_loss": cur["pl"], "cash_flow": cf, "ratios": ratio_rows, "checks": msgs,
-            "notes": {k: v for k, v in cur["detail"].items() if v}}
+            "notes": {k: v for k, v in cur["detail"].items() if v}, "small_company": small,
+            "small_company_test": small_text, "msme_dues": extra["msme"],
+            "ppe_reconciliation": extra["ppe"], "tax": extra["tax"]}
     emit(markdown, data, args)
     if args.out_dir:
-        if write_xlsx(Path(args.out_dir) / "financial_statements.xlsx", sheets):
+        co = books.company
+        heading = [co.get("name") or "", f"CIN: {co.get('cin') or 'n/a'} | Financial year {books.fy} | Amounts in Rs"]
+        if write_xlsx(Path(args.out_dir) / "financial_statements.xlsx", sheets, heading):
             print(f"\nSaved {Path(args.out_dir) / 'financial_statements.xlsx'}")
 
 

@@ -8,8 +8,11 @@
                                                       GSTR-3B tables 3.1, 3.2, 4, 5, 6.1 with rule 88A set-off,
                                                       interest/late fee, and a books-vs-register cross-check
     gst.py reco    <folder> --period 2025-04 --gstr2b 2b.csv [--tolerance 1]
-                                                      purchase register vs GSTR-2B reconciliation
+                                                      purchase register vs GSTR-2B: match, eligible ITC per
+                                                      bill, and a bridge from the 2B total to 3B table 4(C)
     gst.py annual  <folder>                           month-wise summary for GSTR-9 / GSTR-9C working
+
+`gst.py <command> --help` describes one command and its options.
 
 Periods: 2025-04 (month), 2025-26:Q1 (quarter, for QRMP), 2025-26 (year), or 2025-04-01..2025-06-30.
 Credit notes are entered with positive amounts and doc_type CN; the script applies the sign.
@@ -22,6 +25,7 @@ from collections import defaultdict
 from datetime import date, timedelta
 from decimal import Decimal
 from pathlib import Path
+from types import SimpleNamespace
 
 import rules
 from common import (ZERO, Books, BooksError, D, emit, gstin_problem, inr, md_table, money, parse_date, parse_period,
@@ -36,6 +40,39 @@ PURCHASE_TYPES = {"TAX", "IMPG", "IMPS", "ISD", "NIL", "EXEMPT", "NONGST", "COMP
 
 def tax_dict():
     return {h: ZERO for h in HEADS}
+
+
+BLOCKED = {"blocked", "17_5", "17(5)"}
+INELIGIBLE = {"none", "no", "ineligible"}
+
+
+def itc_bucket(ln: dict) -> tuple[str | None, bool]:
+    """GSTR-3B table 4 bucket for a purchase line and whether it is blocked u/s 17(5).
+    None = no ITC (exempt/nil/non-GST inward supply or marked ineligible)."""
+    if ln["stype"] in {"NIL", "EXEMPT", "COMP", "NONGST"} or ln["itc"] in INELIGIBLE:
+        return None, False
+    rcm = ln["rcm"] or ln["stype"] == "IMPS"
+    if ln["itc"] in {"pos", "16_4", "16(4)"}:
+        bucket = "D2"
+    elif ln["stype"] == "IMPG":
+        bucket = "A1"
+    elif ln["stype"] == "IMPS":
+        bucket = "A2"
+    elif ln["stype"] == "ISD":
+        bucket = "A4"
+    elif rcm:
+        bucket = "A3"
+    else:
+        bucket = "A5"
+    return bucket, ln["itc"] in BLOCKED and bucket != "D2"
+
+
+def eligible_itc(ln: dict) -> Decimal:
+    """Signed tax on a purchase line that reaches 4(C) net ITC (before manual reversals)."""
+    bucket, blocked = itc_bucket(ln)
+    if bucket is None or bucket == "D2" or blocked:
+        return ZERO
+    return sum((ln[h] for h in HEADS), ZERO) * ln["sign"]
 
 
 def parse_heads(spec: str | None) -> dict:
@@ -354,27 +391,15 @@ def build_gstr3b(books: Books, start: date, end: date, args, warnings: list) -> 
             t31["d"]["taxable"] += ln["taxable"] * s
             for h in HEADS:
                 t31["d"][h] += ln[h] * s
-        itc = ln["itc"]
-        if itc in {"none", "no", "ineligible"}:
+        bucket, is_blocked = itc_bucket(ln)
+        if bucket is None:
             continue
-        if itc in {"pos", "16_4", "16(4)"}:
-            bucket = "D2"
-        elif ln["stype"] == "IMPG":
-            bucket = "A1"
-        elif ln["stype"] == "IMPS":
-            bucket = "A2"
-        elif ln["stype"] == "ISD":
-            bucket = "A4"
-        elif rcm:
-            bucket = "A3"
-        else:
-            bucket = "A5"
-        if itc in {"blocked", "17_5", "17(5)"} and bucket == "A3":
+        if is_blocked and bucket == "A3":
             blocked_rcm += sum(ln[h] for h in HEADS) * s
             continue
         for h in HEADS:
             t4[bucket][h] += ln[h] * s
-            if itc in {"blocked", "17_5", "17(5)"} and bucket != "D2":
+            if is_blocked:
                 t4["B1"][h] += ln[h] * s
                 blocked[h] += ln[h] * s
     for h, v in parse_heads(args.reverse_42_43).items():
@@ -528,13 +553,18 @@ def norm_inv(s: str) -> str:
 
 
 def reconcile(books: Books, start: date, end: date, path: str, tol: Decimal, warnings: list):
-    purchases = [p for p in load_register(books, "purchase_register", start, end, warnings)
-                 if p["gstin"] and p["stype"] == "TAX" and not p["rcm"] and p["itc"] not in {"none", "no", "ineligible"}]
+    all_lines = load_register(books, "purchase_register", start, end, warnings)
+    purchases = [p for p in all_lines if p["gstin"] and p["stype"] == "TAX" and not p["rcm"]]
+    others = [p for p in all_lines if not (p["gstin"] and p["stype"] == "TAX" and not p["rcm"])]
     bk: dict = {}
     for p in purchases:
         k = (p["gstin"], norm_inv(p["inv"]))
-        e = bk.setdefault(k, {"gstin": p["gstin"], "party": p["party"], "inv": p["inv"], "date": p["date"], "taxable": ZERO, **tax_dict()})
+        e = bk.setdefault(k, {"gstin": p["gstin"], "party": p["party"], "inv": p["inv"], "date": p["date"], "taxable": ZERO,
+                              **tax_dict(), "eligible": ZERO, "itc_flags": set()})
         e["taxable"] += p["taxable"] * p["sign"]
+        e["eligible"] += eligible_itc(p)
+        if not eligible_itc(p) and sum(p[h] for h in HEADS):
+            e["itc_flags"].add({"none": "ineligible", "no": "ineligible"}.get(p["itc"], p["itc"]))
         for h in HEADS:
             e[h] += p[h] * p["sign"]
     tb: dict = {}
@@ -552,7 +582,7 @@ def reconcile(books: Books, start: date, end: date, path: str, tol: Decimal, war
         portal_names = {"igst": "integrated_tax", "cgst": "central_tax", "sgst": "state_ut_tax", "cess": "cess_tax"}
         for h in HEADS:
             e[h] += money(r.get(h) or r.get(portal_names[h])) * sign
-    rows, summary = [], defaultdict(lambda: [0, ZERO, ZERO])
+    rows = []
     unmatched_b = {k: v for k, v in bk.items() if k not in tb}
     unmatched_t = {k: v for k, v in tb.items() if k not in bk}
     for k in sorted(set(bk) & set(tb)):
@@ -561,24 +591,54 @@ def reconcile(books: Books, start: date, end: date, path: str, tol: Decimal, war
         status = "Matched" if all(abs(v) <= tol for v in diff.values()) and abs(b["taxable"] - t["taxable"]) <= tol else "Amount mismatch"
         if (t.get("itc_avail") or "").lower().startswith("n"):
             status = "In 2B but ITC not available"
-        rows.append([status, b["gstin"], b["party"], b["inv"], tot(b), tot(t), tot(b) - tot(t)])
+        rows.append([status, b["gstin"], b["party"], b["inv"], tot(b), b["eligible"], tot(t), tot(b) - tot(t), flags(b)])
     for kb, b in list(unmatched_b.items()):   # probable matches: same supplier, same tax, different invoice number format
         for kt, t in list(unmatched_t.items()):
             if kb[0] == kt[0] and abs(tot(b) - tot(t)) <= tol:
-                rows.append(["Probable match (invoice no differs)", b["gstin"], b["party"], f"{b['inv']} / {t['inv']}", tot(b), tot(t), ZERO])
+                rows.append(["Probable match (invoice no differs)", b["gstin"], b["party"], f"{b['inv']} / {t['inv']}", tot(b),
+                             b["eligible"], tot(t), tot(b) - tot(t), flags(b)])
                 unmatched_b.pop(kb)
                 unmatched_t.pop(kt)
                 break
     for b in unmatched_b.values():
-        rows.append(["In books, not in GSTR-2B", b["gstin"], b["party"], b["inv"], tot(b), ZERO, tot(b)])
+        rows.append(["In books, not in GSTR-2B", b["gstin"], b["party"], b["inv"], tot(b), b["eligible"], ZERO, tot(b), flags(b)])
     for t in unmatched_t.values():
-        rows.append(["In GSTR-2B, not in books", t["gstin"], t["party"], t["inv"], ZERO, tot(t), -tot(t)])
+        rows.append(["In GSTR-2B, not in books", t["gstin"], t["party"], t["inv"], ZERO, ZERO, tot(t), -tot(t), ""])
+    summary = defaultdict(lambda: [0, ZERO, ZERO, ZERO])
     for r in rows:
         s = summary[r[0]]
         s[0] += 1
         s[1] += r[4]
         s[2] += r[5]
-    return rows, summary, bk, tb
+        s[3] += r[6]
+    other_itc = sum((eligible_itc(p) for p in others), ZERO)
+    rcm_itc = sum((eligible_itc(p) for p in others if p["rcm"] or p["stype"] == "IMPS"), ZERO)
+    return rows, summary, bk, tb, {"other_itc": other_itc, "rcm_itc": rcm_itc}
+
+
+def flags(e: dict) -> str:
+    return ", ".join(sorted(e["itc_flags"]))
+
+
+def reco_bridge(rows: list, summary: dict, extra: dict, net_itc_4c: Decimal) -> tuple[list, str | None]:
+    """Walk from ITC per GSTR-2B to 4(C) net ITC as gstr3b computes it from the purchase register."""
+    t2b = sum((r[6] for r in rows), ZERO)
+    books = sum((r[4] for r in rows), ZERO)
+    eligible = sum((r[5] for r in rows), ZERO)
+    out = [["ITC as per GSTR-2B (B2B bills)", t2b]]
+    for status, v in summary.items():
+        if v[1] - v[3]:
+            out.append([f"Add/(less): books less 2B on '{status}'", v[1] - v[3]])
+    out += [["**Tax on B2B forward-charge bills in the purchase register**", books],
+            ["Less: blocked u/s 17(5), ineligible or PoS-restricted on those bills", eligible - books],
+            ["Add: ITC on other register lines (RCM incl. import of services, import of goods, ISD, bills without GSTIN)",
+             extra["other_itc"]],
+            ["**= 4(C) net ITC per gstr3b (before --reverse-42-43 / --reverse-other)**", eligible + extra["other_itc"]]]
+    problem = None
+    if money(eligible + extra["other_itc"]) != money(net_itc_4c):
+        problem = (f"Bridge does not reach gstr3b's 4(C) figure {inr(net_itc_4c)} - difference "
+                   f"{inr(eligible + extra['other_itc'] - net_itc_4c)}")
+    return out, problem
 
 
 def tot(e):
@@ -611,18 +671,50 @@ def annual(books: Books, warnings: list):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("command", choices=["check", "gstr1", "gstr3b", "reco", "annual"])
-    ap.add_argument("folder")
-    ap.add_argument("--period", help="2025-04 | 2025-26:Q1 | 2025-26 | 2025-04-01..2025-04-30")
-    ap.add_argument("--credit-bf", help="ITC brought forward from the electronic credit ledger, e.g. igst=1000,cgst=0,sgst=0")
-    ap.add_argument("--reverse-42-43", help="rule 42/43 reversal to add to 4(B)(1), e.g. cgst=120,sgst=120")
-    ap.add_argument("--reverse-other", help="4(B)(2) reversals, e.g. rule 37 / not in 2B")
-    ap.add_argument("--reclaim", help="4(D)(1) ITC reclaimed")
-    ap.add_argument("--filing-date", help="actual/expected filing date for interest and late fee")
-    ap.add_argument("--gstr2b", help="GSTR-2B B2B data as CSV (see references/gst.md for columns)")
-    ap.add_argument("--tolerance", default="1")
-    ap.add_argument("--out-dir")
-    ap.add_argument("--json", action="store_true")
+    ap.set_defaults(period=None, credit_bf=None, reverse_42_43=None, reverse_other=None, reclaim=None,
+                    filing_date=None, gstr2b=None, tolerance="1")
+    sub = ap.add_subparsers(dest="command", required=True, metavar="{check,gstr1,gstr3b,reco,annual}")
+    common = argparse.ArgumentParser(add_help=False)
+    common.add_argument("folder", help="books folder")
+    common.add_argument("--out-dir", help="also write the report (.md, .json; reco also .csv) here")
+    common.add_argument("--json", action="store_true", help="print JSON instead of markdown")
+    period = argparse.ArgumentParser(add_help=False)
+    period.add_argument("--period", required=True, help="2025-04 | 2025-26:Q1 | 2025-26 | 2025-04-01..2025-04-30")
+    fmt = argparse.RawDescriptionHelpFormatter
+    sub.add_parser("check", parents=[common, period], formatter_class=fmt,
+                   help="validate registers: GSTIN, rates, tax maths, invoice numbers, HSN digits, e-invoice",
+                   description="Validate the sales and purchase registers for the period: GSTIN format and checksum, "
+                               "notified rates (12%%/28%% after GST 2.0), tax maths, invoice-number format and reuse, "
+                               "HSN digits by AATO, and e-invoice applicability.")
+    sub.add_parser("gstr1", parents=[common, period], formatter_class=fmt, help="GSTR-1 tables",
+                   description="GSTR-1 tables from the sales register: B2B/SEZ/deemed exports, B2CL, exports, "
+                               "credit/debit notes (registered and unregistered), B2CS, nil/exempt/non-GST, HSN summary "
+                               "(B2B and B2C tabs) and documents issued.")
+    g3 = sub.add_parser("gstr3b", parents=[common, period], formatter_class=fmt,
+                        help="GSTR-3B with rule 88A set-off, interest and late fee",
+                        description="GSTR-3B tables 3.1, 3.2, 4, 5 and 6.1 from the registers, ITC set-off per s.49 and "
+                                    "rule 88A (minimising cash), cash to deposit, credit carried forward, s.50 interest "
+                                    "and late fee with --filing-date, and a books-vs-register cross-check. "
+                                    "Reverse-charge tax is always paid in cash.")
+    g3.add_argument("--credit-bf", help="ITC brought forward from the electronic credit ledger, e.g. igst=1000,cgst=0,sgst=0")
+    g3.add_argument("--reverse-42-43", help="rule 42/43 reversal to add to 4(B)(1), e.g. cgst=120,sgst=120")
+    g3.add_argument("--reverse-other", help="4(B)(2) reversals, e.g. rule 37 or ITC not yet in GSTR-2B")
+    g3.add_argument("--reclaim", help="4(D)(1) ITC reclaimed")
+    g3.add_argument("--filing-date", help="actual/expected filing date, for s.50 interest and the late fee")
+    rc = sub.add_parser("reco", parents=[common, period], formatter_class=fmt,
+                        help="purchase register vs GSTR-2B, with eligible ITC and a 2B-to-4(C) bridge",
+                        description="Match B2B forward-charge bills in the purchase register with GSTR-2B (GSTIN + "
+                                    "normalised invoice number; probable matches on equal tax). Each row shows the tax, "
+                                    "the eligible ITC (blocked u/s 17(5), ineligible and PoS-restricted bills give nil) "
+                                    "and the 2B tax. The bridge walks from ITC per GSTR-2B to the 4(C) net ITC gstr3b "
+                                    "will compute; RCM, imports and ISD never appear in 2B and enter the bridge "
+                                    "separately. 4(C) takes the register figure, so ITC on bills missing from 2B must be "
+                                    "reversed with gstr3b --reverse-other until the supplier files.")
+    rc.add_argument("--gstr2b", required=True, help="GSTR-2B B2B data as CSV (see references/gst.md for columns)")
+    rc.add_argument("--tolerance", default="1", help="rupee tolerance for a match (default 1)")
+    sub.add_parser("annual", parents=[common], formatter_class=fmt, help="month-wise GSTR-9 / 9C working for the FY",
+                   description="Month-wise outward supplies, tax, RCM and net ITC for the books' financial year: the "
+                               "working for GSTR-9 and GSTR-9C.")
     args = ap.parse_args()
     books = Books(args.folder)
     warnings: list[str] = []
@@ -671,21 +763,42 @@ def main():
                                                            "- GST ledgers in the journal agree with the registers")
     elif args.command == "reco":
         args.report_name = "gstr2b_reco"
-        if not args.gstr2b:
-            raise BooksError("--gstr2b <file.csv> is required")
-        rows, summary, bk, tb = reconcile(books, start, end, args.gstr2b, D(args.tolerance), warnings)
+        rows, summary, bk, tb, extra = reconcile(books, start, end, args.gstr2b, D(args.tolerance), warnings)
+        no_adj = SimpleNamespace(reverse_42_43=None, reverse_other=None, reclaim=None, credit_bf=None, filing_date=None)
+        g3 = build_gstr3b(books, start, end, no_adj, [])
+        net_4c = sum(g3["t4"]["C"].values(), ZERO)
+        bridge, problem = reco_bridge(rows, summary, extra, net_4c)
+        if problem:
+            warnings.append(problem)
+        books_only = summary.get("In books, not in GSTR-2B", [0, ZERO, ZERO, ZERO])[2]
+        heads = ["Status", "GSTIN", "Supplier", "Invoice", "Books tax", "Eligible ITC", "2B tax", "Difference", "ITC flag"]
         md = [f"# Purchase register vs GSTR-2B - {label}", "",
-              md_table(["Status", "Count", "Tax as per books", "Tax as per 2B"], [[k, v[0], v[1], v[2]] for k, v in summary.items()]),
+              md_table(["Status", "Count", "Tax as per books", "Eligible ITC (books)", "Tax as per 2B"],
+                       [[k, v[0], v[1], v[2], v[3]] for k, v in summary.items()]),
               "", f"ITC per books {inr(sum((tot(e) for e in bk.values()), ZERO))} | ITC per GSTR-2B {inr(sum((tot(e) for e in tb.values()), ZERO))}",
-              "", "## Detail", "", md_table(["Status", "GSTIN", "Supplier", "Invoice", "Books tax", "2B tax", "Difference"], rows), "",
-              "Action points: chase suppliers for 'In books, not in GSTR-2B' (ITC cannot be claimed until it appears - sec 16(2)(aa)); "
-              "book or reject in IMS the 'In GSTR-2B, not in books' items; correct amount mismatches with the supplier."]
+              "", "## Detail", "", md_table(heads, rows), "",
+              "_Matching ignores eligibility: a bill blocked u/s 17(5) can be 'Matched' and still give no ITC. "
+              "The Eligible ITC column is what reaches 4(C)._", "",
+              "## Bridge: GSTR-2B to GSTR-3B table 4(C)", "", md_table(["Particulars", "Rs"], bridge), ""]
+        if extra["rcm_itc"]:
+            md.append(f"- RCM ITC of {inr(extra['rcm_itc'])} (4(A)(2)/(3)) is not in GSTR-2B: it is self-assessed and "
+                      "claimable once the reverse-charge tax is paid in cash.")
+        if books_only:
+            md.append(f"- {inr(books_only)} of eligible ITC is on bills not yet in GSTR-2B. gstr3b counts it in 4(A)(5); "
+                      "to claim only 2B-backed credit (s.16(2)(aa)), rerun gstr3b with --reverse-other for these amounts "
+                      "head-wise and reclaim them in 4(D)(1) when the supplier files.")
+        md += ["", "Action points: chase suppliers for 'In books, not in GSTR-2B' (ITC cannot be claimed until it appears - "
+               "sec 16(2)(aa)); book or reject in IMS the 'In GSTR-2B, not in books' items; correct amount mismatches "
+               "with the supplier."]
         md = "\n".join(md)
-        data = {"summary": {k: {"count": v[0], "books": v[1], "gstr2b": v[2]} for k, v in summary.items()},
-                "detail": [dict(zip(["status", "gstin", "supplier", "invoice", "books_tax", "gstr2b_tax", "difference"], r)) for r in rows]}
+        keys = ["status", "gstin", "supplier", "invoice", "books_tax", "eligible_itc", "gstr2b_tax", "difference", "itc_flag"]
+        data = {"summary": {k: {"count": v[0], "books": v[1], "eligible_itc": v[2], "gstr2b": v[3]} for k, v in summary.items()},
+                "detail": [dict(zip(keys, r)) for r in rows],
+                "bridge": [{"particulars": l.replace("**", ""), "amount": a} for l, a in bridge],
+                "net_itc_4c": net_4c, "rcm_itc": extra["rcm_itc"], "itc_not_in_2b": books_only}
         if args.out_dir:
             Path(args.out_dir).mkdir(parents=True, exist_ok=True)
-            write_rows(Path(args.out_dir) / "gstr2b_reco.csv", ["status", "gstin", "supplier", "invoice", "books_tax", "gstr2b_tax", "difference"], rows)
+            write_rows(Path(args.out_dir) / "gstr2b_reco.csv", keys, rows)
     else:
         args.report_name = "gst_annual"
         rows = annual(books, warnings)
