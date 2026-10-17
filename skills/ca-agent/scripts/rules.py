@@ -91,7 +91,12 @@ INDIVIDUAL = {
 
 # HRA exemption, rule 2A: least of HRA received, rent less 10% of salary, and 50% (metro) / 40% of salary,
 # where salary = basic + DA forming part of retirement benefits (+ turnover commission).
-HRA_METRO_CITIES = {"2025-26": ["Delhi", "Mumbai", "Kolkata", "Chennai"]}  # later years: verify the rules under the 2025 Act
+HRA_METRO_CITIES = {
+    "2025-26": ["Delhi", "Mumbai", "Kolkata", "Chennai"],
+    # Income-tax Rules 2026, rule 279: four cities added to the 50% tier from tax year 2026-27
+    # (reported in the draft of 10-Feb-2026 and by KPMG; confirm against the notified rule text).
+    "2026-27": ["Delhi", "Mumbai", "Kolkata", "Chennai", "Bengaluru", "Hyderabad", "Pune", "Ahmedabad"],
+}
 HRA_METRO_PCT, HRA_OTHER_PCT, HRA_RENT_EXCESS_PCT = 0.50, 0.40, 0.10
 
 # Surcharge for individuals/HUF/AOP: (income above, rate). Capped at 15% on 111A/112A/112/dividend income.
@@ -127,12 +132,13 @@ ITR_DUE_DATES = {
         "non_audit": date(2026, 7, 31),
         "non_audit_business": date(2026, 8, 31),   # ITR-3/ITR-4 without audit (Finance Act 2026; verify)
         "audit": date(2026, 10, 31),
-        "audit_extended": date(2026, 11, 21),      # CBDT extension reported Sep-2026 (verify)
-        "transfer_pricing": date(2026, 11, 30),
+        "audit_extended": date(2026, 11, 21),      # CBDT Circular 07/2026 (28-9-2026); not for s.92E (TP) cases
+        "transfer_pricing": date(2026, 11, 30),    # TP cases keep 31 Oct audit / 30 Nov return under the circular
         "tax_audit_report": date(2026, 9, 30),
-        "tax_audit_report_extended": date(2026, 10, 21),  # verify
+        "tax_audit_report_extended": date(2026, 10, 21),  # CBDT Circular 07/2026
         "belated": date(2026, 12, 31),
-        "revised": date(2027, 3, 31),              # 12-month window from Finance Act 2026; fee if late (verify)
+        "revised": date(2027, 3, 31),              # s.139(5) 12-month window (Finance Act 2026); s.234-I fee
+                                                   # Rs 1,000 (income <= 5 lakh) / Rs 5,000 if revised after 31 Dec
     },
     "2026-27": {  # tax year 2026-27, Income-tax Act 2025 (statutory dates; watch for extensions)
         "non_audit": date(2027, 7, 31),

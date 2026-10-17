@@ -638,7 +638,8 @@ def cmd_individual(args):
         if belated and not old_allowed:
             md.append("The return is belated, so it is locked into the new regime anyway (s.115BAC(6)).")
     if filed > dd["belated"]:
-        md.append(f"The belated and revised return window closed on {dd['belated']}. Only an updated return (ITR-U, "
+        md.append(f"The belated-return window closed on {dd['belated']} (a return already filed can still be revised up to "
+                  f"{dd['revised']}). Only an updated return (ITR-U, "
                   "s.139(8A)) is possible: it carries additional tax on top of the tax and interest above, and cannot "
                   "reduce tax or claim a refund.")
     md.append("Salaried taxpayers without business income may choose the regime afresh every year in a return filed by "

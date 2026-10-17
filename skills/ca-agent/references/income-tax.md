@@ -199,12 +199,16 @@ Exemptions:
 **Due dates for FY 2025-26 (AY 2026-27):**
 - Non-audit individuals: 31 July 2026.
 - Non-audit business/profession (ITR-3/ITR-4): 31 August 2026.
-- Companies and audit cases: 31 October 2026, extended by CBDT to 21 November 2026. The tax audit report
-  was extended to 21 October 2026.
-- Transfer pricing cases: 30 November 2026.
+- Companies and audit cases: 31 October 2026, extended to 21 November 2026 by CBDT Circular 07/2026
+  (28 Sep 2026). The tax audit report was extended to 21 October 2026. The extension does not waive
+  s.234A interest.
+- Transfer pricing cases (s.92E): not covered by the extension; Form 3CEB by 31 October and the return by
+  30 November 2026.
 - Belated return: 31 December 2026 (fee u/s 234F of Rs 5,000, or Rs 1,000 if income is up to Rs 5 lakh;
   losses other than HP and unabsorbed depreciation cannot be carried forward).
-- Revised return: up to 31 March 2027 (fee for late revision; verify).
+- Revised return (s.139(5)): up to 31 March 2027, the 12-month window from Finance Act 2026; a belated
+  return can also be revised. Revising after 31 December attracts a fee u/s 234-I of Rs 1,000 (income up to
+  Rs 5 lakh) or Rs 5,000.
 - Updated return (ITR-U): within 48 months, with additional tax of 25%/50%/60%/70% depending on the year.
 
 **Before filing, reconcile with Form 26AS, AIS and TIS:** TDS/TCS credits, SFT-reported transactions,
@@ -301,7 +305,9 @@ income and taxed under their own head; keys `stcg_111a`, `ltcg_112a` and `ltcg_1
 ```
 
 `salary.hra` is worked out under rule 2A (least of HRA received, rent less 10% of `basic_da`, and 50% of
-`basic_da` in Delhi/Mumbai/Kolkata/Chennai or 40% elsewhere; `"metro": true/false` overrides `city`). Do not
+`basic_da` in a metro or 40% elsewhere; `"metro": true/false` overrides `city`). Metros are
+Delhi/Mumbai/Kolkata/Chennai up to FY 2025-26; from tax year 2026-27, rule 279 of the Income-tax Rules 2026
+adds Bengaluru, Hyderabad, Pune and Ahmedabad. Do not
 also put `hra` in `exempt_allowances_old`. `filing_date` drives s.234A/B/C interest and the s.234F fee; when
 it is missing the return is taken as filed on the due date, or today (`--as-of`) if that has passed.
 `due_date` overrides the date from rules.py. A belated return is computed under both regimes but recommended
