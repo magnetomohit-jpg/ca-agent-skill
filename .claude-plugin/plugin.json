@@ -1,0 +1,9 @@
+{
+  "name": "ca-agent",
+  "version": "1.0.0",
+  "description": "Indian Chartered Accountant agent: books of account, GST returns (GSTR-1/3B/2B/9), income tax and ITR (ITR-6, individuals), Schedule III financial statements, depreciation and compliance calendar.",
+  "author": {
+    "name": "magnetomohit-jpg"
+  },
+  "keywords": ["accounting", "gst", "income-tax", "itr", "balance-sheet", "india", "chartered-accountant", "tally"]
+}

@@ -1,0 +1,18 @@
+[
+  {
+    "date": "2025-04-30",
+    "type": "Payment",
+    "narration": "SMS CHGS + GST APR25 (from bank statement)",
+    "ref": "",
+    "lines": [
+      {
+        "account": "Bank Charges",
+        "dr": 590.0
+      },
+      {
+        "account": "HDFC Bank Current A/c",
+        "cr": 590.0
+      }
+    ]
+  }
+]

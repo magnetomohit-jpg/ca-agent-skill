@@ -1,0 +1,456 @@
+{
+  "company": "Sahyadri Trading Private Limited",
+  "fy": "2025-26",
+  "as_of": "2026-03-31",
+  "balance_sheet": {
+    "share_capital": 1000000.0,
+    "other_equity": 1057446.34,
+    "share_application_money": 0.0,
+    "lt_borrowings": 500000.0,
+    "deferred_tax_liab": 0.0,
+    "other_lt_liabilities": 0.0,
+    "lt_provisions": 0.0,
+    "st_borrowings": 0.0,
+    "trade_payables_msme": 354000.0,
+    "trade_payables_others": 0.0,
+    "other_current_liabilities": 166400.0,
+    "st_provisions": 260119.0,
+    "ppe": 276269.95,
+    "intangible_assets": 0.0,
+    "cwip": 0.0,
+    "intangible_under_dev": 0.0,
+    "nc_investments": 0.0,
+    "deferred_tax_asset": 8295.39,
+    "lt_loans_advances": 100000.0,
+    "other_nc_assets": 0.0,
+    "current_investments": 0.0,
+    "inventories": 550000.0,
+    "trade_receivables": 598400.0,
+    "cash_equivalents": 1392100.0,
+    "st_loans_advances": 0.0,
+    "other_current_assets": 412900.0,
+    "other_equity_opening_and_movements": 343129.0
+  },
+  "total_assets": 3337965.34,
+  "total_equity_liabilities": 3337965.34,
+  "profit_and_loss": {
+    "revenue": 4540000.0,
+    "other_income": 8000.0,
+    "total_income": 4548000.0,
+    "expenses": {
+      "cost_materials": 0.0,
+      "purchases_stock": 2100000.0,
+      "changes_inventories": -150000.0,
+      "employee_benefits": 741000.0,
+      "finance_costs": 0.0,
+      "depreciation": 123730.05,
+      "other_expenses": 774000.0
+    },
+    "total_expenses": 3588730.05,
+    "profit_before_exceptional": 959269.95,
+    "exceptional": 0.0,
+    "pbt": 959269.95,
+    "current_tax": 260119.0,
+    "deferred_tax": -15166.39,
+    "pat": 714317.34
+  },
+  "cash_flow": {
+    "operating": [
+      [
+        "Net profit before tax",
+        959269.95
+      ],
+      [
+        "Adjustments for:",
+        null
+      ],
+      [
+        "Depreciation and amortisation",
+        123730.05
+      ],
+      [
+        "Finance costs",
+        0.0
+      ],
+      [
+        "Interest income",
+        -8000.0
+      ],
+      [
+        "Dividend income",
+        0.0
+      ],
+      [
+        "Profit on sale of assets/investments",
+        0.0
+      ],
+      [
+        "Loss on sale of assets/investments",
+        0.0
+      ],
+      [
+        "Operating profit before working capital changes",
+        1075000.0
+      ],
+      [
+        "Working capital changes:",
+        null
+      ],
+      [
+        "Increase/(decrease) in trade payables - total outstanding dues of micro and small enterprises",
+        154000.0
+      ],
+      [
+        "Increase/(decrease) in trade payables - total outstanding dues of creditors other than micro and small enterprises",
+        0.0
+      ],
+      [
+        "Increase/(decrease) in other current liabilities",
+        166400.0
+      ],
+      [
+        "(Increase)/decrease in long-term loans and advances",
+        0.0
+      ],
+      [
+        "(Increase)/decrease in inventories",
+        -150000.0
+      ],
+      [
+        "(Increase)/decrease in trade receivables",
+        -298400.0
+      ],
+      [
+        "(Increase)/decrease in other current assets",
+        -162900.0
+      ],
+      [
+        "Cash generated from operations",
+        784100.0
+      ],
+      [
+        "Income taxes paid (net of refunds)",
+        -250000.0
+      ]
+    ],
+    "net_operating": 534100.0,
+    "investing": [
+      [
+        "Purchase of property, plant and equipment and intangibles (net of disposals)",
+        -100000.0
+      ],
+      [
+        "(Purchase)/sale of investments (net)",
+        0.0
+      ],
+      [
+        "Interest received",
+        8000.0
+      ],
+      [
+        "Dividend received",
+        0.0
+      ]
+    ],
+    "net_investing": -92000.0,
+    "financing": [
+      [
+        "Proceeds from issue of share capital",
+        0.0
+      ],
+      [
+        "Other equity movements (securities premium, dividends paid)",
+        0.0
+      ],
+      [
+        "Long-term borrowings taken/(repaid) (net)",
+        0.0
+      ],
+      [
+        "Short-term borrowings taken/(repaid) (net)",
+        0.0
+      ],
+      [
+        "Finance costs paid",
+        0.0
+      ]
+    ],
+    "net_financing": 0.0,
+    "net_change": 442100.0,
+    "cash_opening": 950000.0,
+    "cash_closing": 1392100.0,
+    "difference": 0.0
+  },
+  "ratios": [
+    {
+      "ratio": "Current ratio",
+      "current": 3.78,
+      "previous": null,
+      "variance_pct": null,
+      "explain": false
+    },
+    {
+      "ratio": "Debt-equity ratio",
+      "current": 0.24,
+      "previous": null,
+      "variance_pct": null,
+      "explain": false
+    },
+    {
+      "ratio": "Return on equity (%)",
+      "current": 42.01,
+      "previous": null,
+      "variance_pct": null,
+      "explain": false
+    },
+    {
+      "ratio": "Inventory turnover",
+      "current": 4.11,
+      "previous": null,
+      "variance_pct": null,
+      "explain": false
+    },
+    {
+      "ratio": "Trade receivables turnover",
+      "current": 10.11,
+      "previous": null,
+      "variance_pct": null,
+      "explain": false
+    },
+    {
+      "ratio": "Trade payables turnover",
+      "current": 7.58,
+      "previous": null,
+      "variance_pct": null,
+      "explain": false
+    },
+    {
+      "ratio": "Net capital turnover",
+      "current": 2.09,
+      "previous": null,
+      "variance_pct": null,
+      "explain": false
+    },
+    {
+      "ratio": "Net profit ratio (%)",
+      "current": 15.73,
+      "previous": null,
+      "variance_pct": null,
+      "explain": false
+    },
+    {
+      "ratio": "Return on capital employed (%)",
+      "current": 37.51,
+      "previous": null,
+      "variance_pct": null,
+      "explain": false
+    }
+  ],
+  "checks": [],
+  "notes": {
+    "share_capital": [
+      [
+        "Equity Share Capital",
+        1000000.0
+      ]
+    ],
+    "other_equity": [
+      [
+        "Surplus in Statement of Profit and Loss",
+        343129.0
+      ],
+      [
+        "Profit/(loss) for the year",
+        714317.34
+      ]
+    ],
+    "lt_borrowings": [
+      [
+        "Unsecured Loans from Directors",
+        500000.0
+      ]
+    ],
+    "trade_payables_msme": [
+      [
+        "Rathod Components Pvt Ltd",
+        354000.0
+      ]
+    ],
+    "other_current_liabilities": [
+      [
+        "Audit Fees Payable",
+        50000.0
+      ],
+      [
+        "RCM CGST Payable",
+        54450.0
+      ],
+      [
+        "RCM SGST Payable",
+        54450.0
+      ],
+      [
+        "TDS Payable - 192 Salary",
+        2000.0
+      ],
+      [
+        "TDS Payable - 194I Rent",
+        5500.0
+      ]
+    ],
+    "st_provisions": [
+      [
+        "Provision for Income Tax",
+        260119.0
+      ]
+    ],
+    "ppe": [
+      [
+        "Computers",
+        250000.0
+      ],
+      [
+        "Furniture and Fixtures",
+        300000.0
+      ],
+      [
+        "Accumulated Depreciation - Computers",
+        -151602.32
+      ],
+      [
+        "Accumulated Depreciation - Furniture and Fixtures",
+        -122127.73
+      ]
+    ],
+    "deferred_tax_asset": [
+      [
+        "Deferred Tax Liability (Net)",
+        8295.39
+      ]
+    ],
+    "lt_loans_advances": [
+      [
+        "Security Deposits",
+        100000.0
+      ]
+    ],
+    "inventories": [
+      [
+        "Stock-in-Trade",
+        550000.0
+      ]
+    ],
+    "trade_receivables": [
+      [
+        "Patil Retail LLP",
+        598400.0
+      ]
+    ],
+    "cash_equivalents": [
+      [
+        "Cash in Hand",
+        55200.0
+      ],
+      [
+        "HDFC Bank Current A/c",
+        1336900.0
+      ]
+    ],
+    "other_current_assets": [
+      [
+        "Advance Tax",
+        250000.0
+      ],
+      [
+        "Input CGST",
+        54450.0
+      ],
+      [
+        "Input IGST",
+        54000.0
+      ],
+      [
+        "Input SGST",
+        54450.0
+      ]
+    ],
+    "revenue_operations": [
+      [
+        "Export Sales",
+        400000.0
+      ],
+      [
+        "Sales - Goods",
+        4140000.0
+      ]
+    ],
+    "other_income": [
+      [
+        "Interest Income",
+        8000.0
+      ]
+    ],
+    "purchases_stock": [
+      [
+        "Purchases - Stock-in-Trade",
+        2100000.0
+      ]
+    ],
+    "changes_inventories": [
+      [
+        "Changes in Inventories",
+        -150000.0
+      ]
+    ],
+    "employee_benefits": [
+      [
+        "Salaries and Wages",
+        720000.0
+      ],
+      [
+        "Staff Welfare Expenses",
+        21000.0
+      ]
+    ],
+    "depreciation": [
+      [
+        "Depreciation",
+        123730.05
+      ]
+    ],
+    "other_expenses": [
+      [
+        "Consumables and Packing Material",
+        50000.0
+      ],
+      [
+        "Payment to Auditors - Statutory Audit",
+        50000.0
+      ],
+      [
+        "Penalties and Fines",
+        2000.0
+      ],
+      [
+        "Rent",
+        660000.0
+      ],
+      [
+        "Repairs and Maintenance - Others",
+        12000.0
+      ]
+    ],
+    "current_tax": [
+      [
+        "Current Tax",
+        260119.0
+      ]
+    ],
+    "deferred_tax": [
+      [
+        "Deferred Tax",
+        -15166.39
+      ]
+    ]
+  }
+}

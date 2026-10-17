@@ -1,0 +1,21 @@
+{
+  "name": "Sahyadri Trading Private Limited",
+  "entity_type": "company",
+  "fy": "2025-26",
+  "pan": "AAKCS1234F",
+  "gstin": "27AAKCS1234F1ZI",
+  "cin": "U51909MH2019PTC123456",
+  "state_code": "27",
+  "gst_filing": "monthly",
+  "tax_regime": "115BAA",
+  "turnover_fy_minus_2": 2800000,
+  "aato_previous_fy": 3200000,
+  "accounting_standards": "AS (Schedule III Division I)",
+  "books_start": "2025-04-01",
+  "notes": "Fictional demo company for the CA Agent skill",
+  "equity_shares_outstanding": 100000,
+  "face_value": 10,
+  "depreciation_method": "WDV",
+  "tds_applicable": true,
+  "tax_audit": false
+}

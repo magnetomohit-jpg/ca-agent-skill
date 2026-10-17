@@ -1,0 +1,153 @@
+{
+  "period": "Apr 2025",
+  "due_date": "2025-05-11",
+  "4A/4B/6B/6C - B2B, SEZ, deemed exports": [
+    {
+      "GSTIN": "27AAQFP4321C1ZD",
+      "Receiver": "Patil Retail LLP",
+      "Invoice": "INV/25-26/001",
+      "Date": "2025-04-10",
+      "Value": 354000.0,
+      "POS": "27",
+      "RCM": "N",
+      "Type": "Regular",
+      "Rate": "18%",
+      "Taxable": 300000.0,
+      "IGST": 0.0,
+      "CGST": 27000.0,
+      "SGST": 27000.0,
+      "Cess": 0.0
+    },
+    {
+      "GSTIN": "29AAFCK5678L1ZQ",
+      "Receiver": "Kaveri Systems Pvt Ltd",
+      "Invoice": "INV/25-26/002",
+      "Date": "2025-04-15",
+      "Value": 236000.0,
+      "POS": "29",
+      "RCM": "N",
+      "Type": "Regular",
+      "Rate": "18%",
+      "Taxable": 200000.0,
+      "IGST": 36000.0,
+      "CGST": 0.0,
+      "SGST": 0.0,
+      "Cess": 0.0
+    }
+  ],
+  "5 - B2C large (inter-state invoices above Rs 1,00,000)": [
+    {
+      "Invoice": "INV/25-26/003",
+      "Date": "2025-04-20",
+      "Value": 141600.0,
+      "POS": "29",
+      "Rate": "18%",
+      "Taxable": 120000.0,
+      "IGST": 21600.0,
+      "CGST": 0.0,
+      "SGST": 0.0,
+      "Cess": 0.0
+    }
+  ],
+  "6A - Exports": [],
+  "9B - Credit/debit notes (registered)": [
+    {
+      "GSTIN": "27AAQFP4321C1ZD",
+      "Receiver": "Patil Retail LLP",
+      "Note": "CN/25-26/001",
+      "Type": "C",
+      "Date": "2025-04-28",
+      "Value": 23600.0,
+      "Original invoice": "INV/25-26/001",
+      "Rate": "18%",
+      "Taxable": 20000.0,
+      "IGST": 0.0,
+      "CGST": 1800.0,
+      "SGST": 1800.0,
+      "Cess": 0.0
+    }
+  ],
+  "9B - Credit/debit notes (unregistered: B2CL / exports)": [],
+  "7 - B2C others": [
+    [
+      "27-Maharashtra",
+      "18%",
+      40000.0,
+      0.0,
+      3600.0,
+      3600.0,
+      0.0
+    ]
+  ],
+  "8 - Nil/exempt/non-GST": [],
+  "12 - HSN summary B2B": [
+    [
+      "850440",
+      "Power adapters 65W",
+      "NOS",
+      "18%",
+      "400",
+      280000.0,
+      0.0,
+      25200.0,
+      25200.0,
+      0.0
+    ],
+    [
+      "854442",
+      "USB-C cables",
+      "NOS",
+      "18%",
+      "2000",
+      200000.0,
+      36000.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  ],
+  "12 - HSN summary B2C": [
+    [
+      "850440",
+      "Power adapters 65W",
+      "NOS",
+      "18%",
+      "160",
+      120000.0,
+      21600.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      "854442",
+      "USB-C cables",
+      "NOS",
+      "18%",
+      "400",
+      40000.0,
+      0.0,
+      3600.0,
+      3600.0,
+      0.0
+    ]
+  ],
+  "13 - Documents issued": [
+    [
+      "Invoices for outward supply",
+      "INV/25-26/001",
+      "INV/25-26/004",
+      4,
+      0,
+      4
+    ],
+    [
+      "Credit notes",
+      "CN/25-26/001",
+      "CN/25-26/001",
+      1,
+      0,
+      1
+    ]
+  ]
+}

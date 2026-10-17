@@ -1,0 +1,18 @@
+[
+  {
+    "date": "2026-03-31",
+    "type": "Journal",
+    "ref": "TAX-PROV-FY2526",
+    "narration": "Provision for income tax FY 2025-26 (s.115BAA)",
+    "lines": [
+      {
+        "account": "Current Tax",
+        "dr": 260119.0
+      },
+      {
+        "account": "Provision for Income Tax",
+        "cr": 260119.0
+      }
+    ]
+  }
+]

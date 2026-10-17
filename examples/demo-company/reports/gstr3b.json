@@ -1,0 +1,176 @@
+{
+  "period": "Apr 2025",
+  "due_date": "2025-05-20",
+  "3.1": {
+    "a": {
+      "taxable": 640000.0,
+      "igst": 57600.0,
+      "cgst": 28800.0,
+      "sgst": 28800.0,
+      "cess": 0.0
+    },
+    "b": {
+      "taxable": 0.0,
+      "igst": 0.0,
+      "cgst": 0.0,
+      "sgst": 0.0,
+      "cess": 0.0
+    },
+    "c": {
+      "taxable": 0.0,
+      "igst": 0.0,
+      "cgst": 0.0,
+      "sgst": 0.0,
+      "cess": 0.0
+    },
+    "d": {
+      "taxable": 55000.0,
+      "igst": 0.0,
+      "cgst": 4950.0,
+      "sgst": 4950.0,
+      "cess": 0.0
+    },
+    "e": {
+      "taxable": 0.0,
+      "igst": 0.0,
+      "cgst": 0.0,
+      "sgst": 0.0,
+      "cess": 0.0
+    }
+  },
+  "3.2": {
+    "29": [
+      120000.0,
+      21600.0
+    ]
+  },
+  "4": {
+    "A1": {
+      "igst": 0.0,
+      "cgst": 0.0,
+      "sgst": 0.0,
+      "cess": 0.0
+    },
+    "A2": {
+      "igst": 0.0,
+      "cgst": 0.0,
+      "sgst": 0.0,
+      "cess": 0.0
+    },
+    "A3": {
+      "igst": 0.0,
+      "cgst": 4950.0,
+      "sgst": 4950.0,
+      "cess": 0.0
+    },
+    "A4": {
+      "igst": 0.0,
+      "cgst": 0.0,
+      "sgst": 0.0,
+      "cess": 0.0
+    },
+    "A5": {
+      "igst": 90000.0,
+      "cgst": 3500.0,
+      "sgst": 3500.0,
+      "cess": 0.0
+    },
+    "B1": {
+      "igst": 0.0,
+      "cgst": 500.0,
+      "sgst": 500.0,
+      "cess": 0.0
+    },
+    "B2": {
+      "igst": 0.0,
+      "cgst": 0.0,
+      "sgst": 0.0,
+      "cess": 0.0
+    },
+    "D1": {
+      "igst": 0.0,
+      "cgst": 0.0,
+      "sgst": 0.0,
+      "cess": 0.0
+    },
+    "D2": {
+      "igst": 0.0,
+      "cgst": 0.0,
+      "sgst": 0.0,
+      "cess": 0.0
+    },
+    "A": {
+      "igst": 90000.0,
+      "cgst": 8450.0,
+      "sgst": 8450.0,
+      "cess": 0.0
+    },
+    "B": {
+      "igst": 0.0,
+      "cgst": 500.0,
+      "sgst": 500.0,
+      "cess": 0.0
+    },
+    "C": {
+      "igst": 90000.0,
+      "cgst": 7950.0,
+      "sgst": 7950.0,
+      "cess": 0.0
+    }
+  },
+  "5": {
+    "exempt_inter": 0.0,
+    "exempt_intra": 0.0,
+    "nongst_inter": 0.0,
+    "nongst_intra": 0.0
+  },
+  "liability": {
+    "igst": 57600.0,
+    "cgst": 28800.0,
+    "sgst": 28800.0,
+    "cess": 0.0
+  },
+  "rcm_liability": {
+    "igst": 0.0,
+    "cgst": 4950.0,
+    "sgst": 4950.0,
+    "cess": 0.0
+  },
+  "itc_available": {
+    "igst": 90000.0,
+    "cgst": 7950.0,
+    "sgst": 7950.0,
+    "cess": 0.0
+  },
+  "setoff": {
+    "igst->igst": 57600.0,
+    "igst->cgst": 20850.0,
+    "igst->sgst": 11550.0,
+    "cgst->cgst": 7950.0,
+    "sgst->sgst": 7950.0
+  },
+  "cash": {
+    "igst": 0.0,
+    "cgst": 4950.0,
+    "sgst": 14250.0,
+    "cess": 0.0
+  },
+  "interest": {
+    "igst": 0.0,
+    "cgst": 0.0,
+    "sgst": 0.0,
+    "cess": 0.0
+  },
+  "late_fee": {
+    "cgst": 0.0,
+    "sgst": 0.0
+  },
+  "total_cash": 19200.0,
+  "credit_carried_forward": {
+    "igst": 0.0,
+    "cgst": 0.0,
+    "sgst": 0.0,
+    "cess": 0.0
+  },
+  "books_crosscheck": []
+}

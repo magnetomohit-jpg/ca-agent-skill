@@ -1,0 +1,389 @@
+{
+  "events": [
+    {
+      "date": "2025-05-07",
+      "area": "TDS",
+      "item": "Deposit TDS/TCS (challan ITNS 281)",
+      "period": "Apr 2025",
+      "note": ""
+    },
+    {
+      "date": "2025-05-11",
+      "area": "GST",
+      "item": "GSTR-1",
+      "period": "Apr 2025",
+      "note": ""
+    },
+    {
+      "date": "2025-05-20",
+      "area": "GST",
+      "item": "GSTR-3B + tax payment",
+      "period": "Apr 2025",
+      "note": ""
+    },
+    {
+      "date": "2025-06-07",
+      "area": "TDS",
+      "item": "Deposit TDS/TCS (challan ITNS 281)",
+      "period": "May 2025",
+      "note": ""
+    },
+    {
+      "date": "2025-06-11",
+      "area": "GST",
+      "item": "GSTR-1",
+      "period": "May 2025",
+      "note": ""
+    },
+    {
+      "date": "2025-06-15",
+      "area": "Income tax",
+      "item": "Advance tax instalment (15% cumulative)",
+      "period": "FY 2025-26",
+      "note": ""
+    },
+    {
+      "date": "2025-06-20",
+      "area": "GST",
+      "item": "GSTR-3B + tax payment",
+      "period": "May 2025",
+      "note": ""
+    },
+    {
+      "date": "2025-07-07",
+      "area": "TDS",
+      "item": "Deposit TDS/TCS (challan ITNS 281)",
+      "period": "Jun 2025",
+      "note": ""
+    },
+    {
+      "date": "2025-07-11",
+      "area": "GST",
+      "item": "GSTR-1",
+      "period": "Jun 2025",
+      "note": ""
+    },
+    {
+      "date": "2025-07-20",
+      "area": "GST",
+      "item": "GSTR-3B + tax payment",
+      "period": "Jun 2025",
+      "note": ""
+    },
+    {
+      "date": "2025-07-31",
+      "area": "TDS",
+      "item": "TDS returns 24Q/26Q (and 27EQ for TCS by the 15th)",
+      "period": "Q1 FY 2025-26",
+      "note": ""
+    },
+    {
+      "date": "2025-08-07",
+      "area": "TDS",
+      "item": "Deposit TDS/TCS (challan ITNS 281)",
+      "period": "Jul 2025",
+      "note": ""
+    },
+    {
+      "date": "2025-08-11",
+      "area": "GST",
+      "item": "GSTR-1",
+      "period": "Jul 2025",
+      "note": ""
+    },
+    {
+      "date": "2025-08-20",
+      "area": "GST",
+      "item": "GSTR-3B + tax payment",
+      "period": "Jul 2025",
+      "note": ""
+    },
+    {
+      "date": "2025-09-07",
+      "area": "TDS",
+      "item": "Deposit TDS/TCS (challan ITNS 281)",
+      "period": "Aug 2025",
+      "note": ""
+    },
+    {
+      "date": "2025-09-11",
+      "area": "GST",
+      "item": "GSTR-1",
+      "period": "Aug 2025",
+      "note": ""
+    },
+    {
+      "date": "2025-09-15",
+      "area": "Income tax",
+      "item": "Advance tax instalment (45% cumulative)",
+      "period": "FY 2025-26",
+      "note": ""
+    },
+    {
+      "date": "2025-09-20",
+      "area": "GST",
+      "item": "GSTR-3B + tax payment",
+      "period": "Aug 2025",
+      "note": ""
+    },
+    {
+      "date": "2025-10-07",
+      "area": "TDS",
+      "item": "Deposit TDS/TCS (challan ITNS 281)",
+      "period": "Sep 2025",
+      "note": ""
+    },
+    {
+      "date": "2025-10-11",
+      "area": "GST",
+      "item": "GSTR-1",
+      "period": "Sep 2025",
+      "note": ""
+    },
+    {
+      "date": "2025-10-20",
+      "area": "GST",
+      "item": "GSTR-3B + tax payment",
+      "period": "Sep 2025",
+      "note": ""
+    },
+    {
+      "date": "2025-10-31",
+      "area": "ROC",
+      "item": "MSME-1 (dues to micro/small enterprises > 45 days)",
+      "period": "Apr-Sep 2025",
+      "note": "if applicable"
+    },
+    {
+      "date": "2025-10-31",
+      "area": "TDS",
+      "item": "TDS returns 24Q/26Q (and 27EQ for TCS by the 15th)",
+      "period": "Q2 FY 2025-26",
+      "note": ""
+    },
+    {
+      "date": "2025-11-07",
+      "area": "TDS",
+      "item": "Deposit TDS/TCS (challan ITNS 281)",
+      "period": "Oct 2025",
+      "note": ""
+    },
+    {
+      "date": "2025-11-11",
+      "area": "GST",
+      "item": "GSTR-1",
+      "period": "Oct 2025",
+      "note": ""
+    },
+    {
+      "date": "2025-11-20",
+      "area": "GST",
+      "item": "GSTR-3B + tax payment",
+      "period": "Oct 2025",
+      "note": ""
+    },
+    {
+      "date": "2025-12-07",
+      "area": "TDS",
+      "item": "Deposit TDS/TCS (challan ITNS 281)",
+      "period": "Nov 2025",
+      "note": ""
+    },
+    {
+      "date": "2025-12-11",
+      "area": "GST",
+      "item": "GSTR-1",
+      "period": "Nov 2025",
+      "note": ""
+    },
+    {
+      "date": "2025-12-15",
+      "area": "Income tax",
+      "item": "Advance tax instalment (75% cumulative)",
+      "period": "FY 2025-26",
+      "note": ""
+    },
+    {
+      "date": "2025-12-20",
+      "area": "GST",
+      "item": "GSTR-3B + tax payment",
+      "period": "Nov 2025",
+      "note": ""
+    },
+    {
+      "date": "2026-01-07",
+      "area": "TDS",
+      "item": "Deposit TDS/TCS (challan ITNS 281)",
+      "period": "Dec 2025",
+      "note": ""
+    },
+    {
+      "date": "2026-01-11",
+      "area": "GST",
+      "item": "GSTR-1",
+      "period": "Dec 2025",
+      "note": ""
+    },
+    {
+      "date": "2026-01-20",
+      "area": "GST",
+      "item": "GSTR-3B + tax payment",
+      "period": "Dec 2025",
+      "note": ""
+    },
+    {
+      "date": "2026-01-31",
+      "area": "TDS",
+      "item": "TDS returns 24Q/26Q (and 27EQ for TCS by the 15th)",
+      "period": "Q3 FY 2025-26",
+      "note": ""
+    },
+    {
+      "date": "2026-02-07",
+      "area": "TDS",
+      "item": "Deposit TDS/TCS (challan ITNS 281)",
+      "period": "Jan 2026",
+      "note": ""
+    },
+    {
+      "date": "2026-02-11",
+      "area": "GST",
+      "item": "GSTR-1",
+      "period": "Jan 2026",
+      "note": ""
+    },
+    {
+      "date": "2026-02-20",
+      "area": "GST",
+      "item": "GSTR-3B + tax payment",
+      "period": "Jan 2026",
+      "note": ""
+    },
+    {
+      "date": "2026-03-07",
+      "area": "TDS",
+      "item": "Deposit TDS/TCS (challan ITNS 281)",
+      "period": "Feb 2026",
+      "note": ""
+    },
+    {
+      "date": "2026-03-11",
+      "area": "GST",
+      "item": "GSTR-1",
+      "period": "Feb 2026",
+      "note": ""
+    },
+    {
+      "date": "2026-03-15",
+      "area": "Income tax",
+      "item": "Advance tax instalment (100% cumulative)",
+      "period": "FY 2025-26",
+      "note": ""
+    },
+    {
+      "date": "2026-03-20",
+      "area": "GST",
+      "item": "GSTR-3B + tax payment",
+      "period": "Feb 2026",
+      "note": ""
+    },
+    {
+      "date": "2026-04-11",
+      "area": "GST",
+      "item": "GSTR-1",
+      "period": "Mar 2026",
+      "note": ""
+    },
+    {
+      "date": "2026-04-20",
+      "area": "GST",
+      "item": "GSTR-3B + tax payment",
+      "period": "Mar 2026",
+      "note": ""
+    },
+    {
+      "date": "2026-04-30",
+      "area": "ROC",
+      "item": "MSME-1 (dues to micro/small enterprises > 45 days)",
+      "period": "Oct 2025-Mar 2026",
+      "note": "if applicable"
+    },
+    {
+      "date": "2026-04-30",
+      "area": "TDS",
+      "item": "Deposit TDS/TCS (challan ITNS 281)",
+      "period": "Mar 2026",
+      "note": ""
+    },
+    {
+      "date": "2026-05-31",
+      "area": "TDS",
+      "item": "TDS returns 24Q/26Q (and 27EQ for TCS by the 15th)",
+      "period": "Q4 FY 2025-26",
+      "note": ""
+    },
+    {
+      "date": "2026-06-15",
+      "area": "TDS",
+      "item": "Issue Form 16 to employees",
+      "period": "FY 2025-26",
+      "note": ""
+    },
+    {
+      "date": "2026-06-30",
+      "area": "ROC",
+      "item": "DPT-3 (return of deposits / exempted loans)",
+      "period": "as at 31 Mar 2026",
+      "note": ""
+    },
+    {
+      "date": "2026-06-30",
+      "area": "ROC",
+      "item": "DIR-3 KYC for directors due in this cycle",
+      "period": "FY 2025-26",
+      "note": "once every 3 years"
+    },
+    {
+      "date": "2026-09-30",
+      "area": "ROC",
+      "item": "Hold AGM (within 6 months of year end)",
+      "period": "FY 2025-26",
+      "note": ""
+    },
+    {
+      "date": "2026-10-15",
+      "area": "ROC",
+      "item": "ADT-1 (auditor appointment)",
+      "period": "FY 2025-26",
+      "note": "only in an appointment year"
+    },
+    {
+      "date": "2026-10-30",
+      "area": "ROC",
+      "item": "AOC-4 (financial statements)",
+      "period": "FY 2025-26",
+      "note": "30 days from AGM (AGM assumed 30 Sep)"
+    },
+    {
+      "date": "2026-11-21",
+      "area": "Income tax",
+      "item": "Income-tax return (ITR-6)",
+      "period": "FY 2025-26",
+      "note": ""
+    },
+    {
+      "date": "2026-11-29",
+      "area": "ROC",
+      "item": "MGT-7/MGT-7A (annual return)",
+      "period": "FY 2025-26",
+      "note": "60 days from AGM"
+    },
+    {
+      "date": "2026-12-31",
+      "area": "GST",
+      "item": "GSTR-9 annual return",
+      "period": "FY 2025-26",
+      "note": "optional below Rs 2 crore AATO"
+    }
+  ]
+}

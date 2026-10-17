@@ -1,0 +1,26 @@
+{
+  "account": "HDFC Bank Current A/c",
+  "as_of": "2025-04-30",
+  "book_balance": 1064100.0,
+  "computed_bank_balance": 1121510.0,
+  "statement_balance": 1121510.0,
+  "unpresented": [
+    {
+      "date": "2025-04-30",
+      "voucher": "PMT/2025-26/0004",
+      "narration": "Salaries April 2025 less TDS u/s 192",
+      "ref": "SAL-APR25",
+      "amount": -58000.0
+    }
+  ],
+  "uncredited": [],
+  "bank_only": [
+    {
+      "date": "2025-04-30",
+      "desc": "SMS CHGS + GST APR25",
+      "ref": "",
+      "amount": -590.0,
+      "balance": "1091510"
+    }
+  ]
+}

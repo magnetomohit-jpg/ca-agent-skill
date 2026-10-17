@@ -1,0 +1,4 @@
+asset_id,description,asset_account,acc_dep_account,sch2_category,useful_life_years,residual_pct,it_block,put_to_use_date,cost,opening_acc_dep,disposal_date,sale_value,additional_dep_eligible
+FA-001,Office furniture and workstations,Furniture and Fixtures,Accumulated Depreciation - Furniture and Fixtures,furniture,,,furniture,2022-06-01,300000,60000,,,N
+FA-002,Laptops (5 nos),Computers,Accumulated Depreciation - Computers,computer_end_user,,,computers,2023-07-01,150000,90000,,,N
+FA-003,Laptops (3 nos) - Infotech IT/301,Computers,Accumulated Depreciation - Computers,computer_end_user,,,computers,2025-11-15,100000,0,,,N

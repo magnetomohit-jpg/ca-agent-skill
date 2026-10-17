@@ -1,0 +1,22 @@
+[
+  {
+    "date": "2026-03-31",
+    "type": "Journal",
+    "ref": "DEP-2025-26",
+    "narration": "Depreciation for FY 2025-26 as per Schedule II (WDV)",
+    "lines": [
+      {
+        "account": "Depreciation",
+        "dr": 123730.05
+      },
+      {
+        "account": "Accumulated Depreciation - Furniture and Fixtures",
+        "cr": 62127.73
+      },
+      {
+        "account": "Accumulated Depreciation - Computers",
+        "cr": 61602.32
+      }
+    ]
+  }
+]

@@ -1,0 +1,160 @@
+date,voucher_no,voucher_type,account,debit,credit,narration,ref
+2025-04-01,OPN/2025-26/0001,Opening,Furniture and Fixtures,300000.00,0.00,Balances brought forward from FY 2024-25 audited balance sheet,
+2025-04-01,OPN/2025-26/0001,Opening,Computers,150000.00,0.00,Balances brought forward from FY 2024-25 audited balance sheet,
+2025-04-01,OPN/2025-26/0001,Opening,Stock-in-Trade,400000.00,0.00,Balances brought forward from FY 2024-25 audited balance sheet,
+2025-04-01,OPN/2025-26/0001,Opening,Patil Retail LLP,300000.00,0.00,Balances brought forward from FY 2024-25 audited balance sheet,
+2025-04-01,OPN/2025-26/0001,Opening,HDFC Bank Current A/c,900000.00,0.00,Balances brought forward from FY 2024-25 audited balance sheet,
+2025-04-01,OPN/2025-26/0001,Opening,Cash in Hand,50000.00,0.00,Balances brought forward from FY 2024-25 audited balance sheet,
+2025-04-01,OPN/2025-26/0001,Opening,Security Deposits,100000.00,0.00,Balances brought forward from FY 2024-25 audited balance sheet,
+2025-04-01,OPN/2025-26/0001,Opening,Equity Share Capital,0.00,1000000.00,Balances brought forward from FY 2024-25 audited balance sheet,
+2025-04-01,OPN/2025-26/0001,Opening,Surplus in Statement of Profit and Loss,0.00,343129.00,Balances brought forward from FY 2024-25 audited balance sheet,
+2025-04-01,OPN/2025-26/0001,Opening,Deferred Tax Liability (Net),0.00,6871.00,Balances brought forward from FY 2024-25 audited balance sheet,
+2025-04-01,OPN/2025-26/0001,Opening,Unsecured Loans from Directors,0.00,500000.00,Balances brought forward from FY 2024-25 audited balance sheet,
+2025-04-01,OPN/2025-26/0001,Opening,Rathod Components Pvt Ltd,0.00,200000.00,Balances brought forward from FY 2024-25 audited balance sheet,
+2025-04-01,OPN/2025-26/0001,Opening,Accumulated Depreciation - Furniture and Fixtures,0.00,60000.00,Balances brought forward from FY 2024-25 audited balance sheet,
+2025-04-01,OPN/2025-26/0001,Opening,Accumulated Depreciation - Computers,0.00,90000.00,Balances brought forward from FY 2024-25 audited balance sheet,
+2025-04-05,PUR/2025-26/0001,Purchase,Purchases - Stock-in-Trade,500000.00,0.00,Power adapters from Rathod Components (Gujarat),RC/101
+2025-04-05,PUR/2025-26/0001,Purchase,Input IGST,90000.00,0.00,Power adapters from Rathod Components (Gujarat),RC/101
+2025-04-05,PUR/2025-26/0001,Purchase,Rathod Components Pvt Ltd,0.00,590000.00,Power adapters from Rathod Components (Gujarat),RC/101
+2025-04-08,PUR/2025-26/0002,Purchase,Consumables and Packing Material,50000.00,0.00,Corrugated boxes from Mehta Packaging,MP/55
+2025-04-08,PUR/2025-26/0002,Purchase,Input CGST,3000.00,0.00,Corrugated boxes from Mehta Packaging,MP/55
+2025-04-08,PUR/2025-26/0002,Purchase,Input SGST,3000.00,0.00,Corrugated boxes from Mehta Packaging,MP/55
+2025-04-08,PUR/2025-26/0002,Purchase,Mehta Packaging,0.00,56000.00,Corrugated boxes from Mehta Packaging,MP/55
+2025-04-10,SAL/2025-26/0001,Sales,Patil Retail LLP,354000.00,0.00,Sale to Patil Retail LLP,INV/25-26/001
+2025-04-10,SAL/2025-26/0001,Sales,Sales - Goods,0.00,300000.00,Sale to Patil Retail LLP,INV/25-26/001
+2025-04-10,SAL/2025-26/0001,Sales,Output CGST,0.00,27000.00,Sale to Patil Retail LLP,INV/25-26/001
+2025-04-10,SAL/2025-26/0001,Sales,Output SGST,0.00,27000.00,Sale to Patil Retail LLP,INV/25-26/001
+2025-04-12,PMT/2025-26/0001,Payment,Repairs and Maintenance - Others,12000.00,0.00,Office repairs paid in cash,CASH-001
+2025-04-12,PMT/2025-26/0001,Payment,Cash in Hand,0.00,12000.00,Office repairs paid in cash,CASH-001
+2025-04-15,SAL/2025-26/0002,Sales,Kaveri Systems Pvt Ltd,236000.00,0.00,Sale to Kaveri Systems (Karnataka),INV/25-26/002
+2025-04-15,SAL/2025-26/0002,Sales,Sales - Goods,0.00,200000.00,Sale to Kaveri Systems (Karnataka),INV/25-26/002
+2025-04-15,SAL/2025-26/0002,Sales,Output IGST,0.00,36000.00,Sale to Kaveri Systems (Karnataka),INV/25-26/002
+2025-04-16,PUR/2025-26/0003,Purchase,Staff Welfare Expenses,21000.00,0.00,"Staff lunch - ITC blocked u/s 17(5), GST included in cost",AC/77
+2025-04-16,PUR/2025-26/0003,Purchase,Annapurna Caterers,0.00,21000.00,"Staff lunch - ITC blocked u/s 17(5), GST included in cost",AC/77
+2025-04-18,PMT/2025-26/0002,Payment,Rathod Components Pvt Ltd,200000.00,0.00,RTGS to Rathod Components - opening dues,HDFCR52025041800123
+2025-04-18,PMT/2025-26/0002,Payment,HDFC Bank Current A/c,0.00,200000.00,RTGS to Rathod Components - opening dues,HDFCR52025041800123
+2025-04-20,SAL/2025-26/0003,Sales,HDFC Bank Current A/c,141600.00,0.00,"Sale to walk-in customer, Bengaluru - paid by UPI",INV/25-26/003
+2025-04-20,SAL/2025-26/0003,Sales,Sales - Goods,0.00,120000.00,"Sale to walk-in customer, Bengaluru - paid by UPI",INV/25-26/003
+2025-04-20,SAL/2025-26/0003,Sales,Output IGST,0.00,21600.00,"Sale to walk-in customer, Bengaluru - paid by UPI",INV/25-26/003
+2025-04-22,SAL/2025-26/0004,Sales,Cash in Hand,47200.00,0.00,Counter cash sales,INV/25-26/004
+2025-04-22,SAL/2025-26/0004,Sales,Sales - Goods,0.00,40000.00,Counter cash sales,INV/25-26/004
+2025-04-22,SAL/2025-26/0004,Sales,Output CGST,0.00,3600.00,Counter cash sales,INV/25-26/004
+2025-04-22,SAL/2025-26/0004,Sales,Output SGST,0.00,3600.00,Counter cash sales,INV/25-26/004
+2025-04-25,PMT/2025-26/0003,Payment,Rent,55000.00,0.00,Office rent April 2025 less TDS u/s 194I,CHQ 000123
+2025-04-25,PMT/2025-26/0003,Payment,TDS Payable - 194I Rent,0.00,5500.00,Office rent April 2025 less TDS u/s 194I,CHQ 000123
+2025-04-25,PMT/2025-26/0003,Payment,HDFC Bank Current A/c,0.00,49500.00,Office rent April 2025 less TDS u/s 194I,CHQ 000123
+2025-04-25,JV/2025-26/0001,Journal,Input CGST,4950.00,0.00,GST under reverse charge on rent from unregistered landlord,RCM-APR25
+2025-04-25,JV/2025-26/0001,Journal,Input SGST,4950.00,0.00,GST under reverse charge on rent from unregistered landlord,RCM-APR25
+2025-04-25,JV/2025-26/0001,Journal,RCM CGST Payable,0.00,4950.00,GST under reverse charge on rent from unregistered landlord,RCM-APR25
+2025-04-25,JV/2025-26/0001,Journal,RCM SGST Payable,0.00,4950.00,GST under reverse charge on rent from unregistered landlord,RCM-APR25
+2025-04-26,RCT/2025-26/0001,Receipt,HDFC Bank Current A/c,300000.00,0.00,NEFT from Patil Retail LLP,N116250426778
+2025-04-26,RCT/2025-26/0001,Receipt,Patil Retail LLP,0.00,300000.00,NEFT from Patil Retail LLP,N116250426778
+2025-04-28,CN/2025-26/0001,Credit Note,Sales - Goods,20000.00,0.00,Return of damaged adapters by Patil Retail,CN/25-26/001
+2025-04-28,CN/2025-26/0001,Credit Note,Output CGST,1800.00,0.00,Return of damaged adapters by Patil Retail,CN/25-26/001
+2025-04-28,CN/2025-26/0001,Credit Note,Output SGST,1800.00,0.00,Return of damaged adapters by Patil Retail,CN/25-26/001
+2025-04-28,CN/2025-26/0001,Credit Note,Patil Retail LLP,0.00,23600.00,Return of damaged adapters by Patil Retail,CN/25-26/001
+2025-04-30,PMT/2025-26/0004,Payment,Salaries and Wages,60000.00,0.00,Salaries April 2025 less TDS u/s 192,SAL-APR25
+2025-04-30,PMT/2025-26/0004,Payment,TDS Payable - 192 Salary,0.00,2000.00,Salaries April 2025 less TDS u/s 192,SAL-APR25
+2025-04-30,PMT/2025-26/0004,Payment,HDFC Bank Current A/c,0.00,58000.00,Salaries April 2025 less TDS u/s 192,SAL-APR25
+2025-04-30,CON/2025-26/0001,Contra,HDFC Bank Current A/c,30000.00,0.00,Cash deposited into HDFC,DEP-APR25
+2025-04-30,CON/2025-26/0001,Contra,Cash in Hand,0.00,30000.00,Cash deposited into HDFC,DEP-APR25
+2025-05-07,PMT/2025-26/0005,Payment,TDS Payable - 194I Rent,5500.00,0.00,TDS for April 2025 deposited,TDS-APR25
+2025-05-07,PMT/2025-26/0005,Payment,TDS Payable - 192 Salary,2000.00,0.00,TDS for April 2025 deposited,TDS-APR25
+2025-05-07,PMT/2025-26/0005,Payment,HDFC Bank Current A/c,0.00,7500.00,TDS for April 2025 deposited,TDS-APR25
+2025-05-20,JV/2025-26/0002,Journal,Output IGST,57600.00,0.00,GSTR-3B April 2025: ITC set-off and cash payment,GSTR3B-APR25
+2025-05-20,JV/2025-26/0002,Journal,Output CGST,28800.00,0.00,GSTR-3B April 2025: ITC set-off and cash payment,GSTR3B-APR25
+2025-05-20,JV/2025-26/0002,Journal,Output SGST,28800.00,0.00,GSTR-3B April 2025: ITC set-off and cash payment,GSTR3B-APR25
+2025-05-20,JV/2025-26/0002,Journal,Input IGST,0.00,90000.00,GSTR-3B April 2025: ITC set-off and cash payment,GSTR3B-APR25
+2025-05-20,JV/2025-26/0002,Journal,Input CGST,0.00,7950.00,GSTR-3B April 2025: ITC set-off and cash payment,GSTR3B-APR25
+2025-05-20,JV/2025-26/0002,Journal,Input SGST,0.00,7950.00,GSTR-3B April 2025: ITC set-off and cash payment,GSTR3B-APR25
+2025-05-20,JV/2025-26/0002,Journal,HDFC Bank Current A/c,0.00,9300.00,GSTR-3B April 2025: ITC set-off and cash payment,GSTR3B-APR25
+2025-05-20,PMT/2025-26/0006,Payment,RCM CGST Payable,4950.00,0.00,Reverse-charge GST for April 2025 paid in cash,RCM-PAY-APR25
+2025-05-20,PMT/2025-26/0006,Payment,RCM SGST Payable,4950.00,0.00,Reverse-charge GST for April 2025 paid in cash,RCM-PAY-APR25
+2025-05-20,PMT/2025-26/0006,Payment,HDFC Bank Current A/c,0.00,9900.00,Reverse-charge GST for April 2025 paid in cash,RCM-PAY-APR25
+2025-06-14,PMT/2025-26/0007,Payment,Advance Tax,30000.00,0.00,Advance tax instalment 1,ADV-TAX-Q1
+2025-06-14,PMT/2025-26/0007,Payment,HDFC Bank Current A/c,0.00,30000.00,Advance tax instalment 1,ADV-TAX-Q1
+2025-06-15,SAL/2025-26/0005,Sales,Patil Retail LLP,944000.00,0.00,Sale to Patil Retail LLP,INV/25-26/005
+2025-06-15,SAL/2025-26/0005,Sales,Sales - Goods,0.00,800000.00,Sale to Patil Retail LLP,INV/25-26/005
+2025-06-15,SAL/2025-26/0005,Sales,Output CGST,0.00,72000.00,Sale to Patil Retail LLP,INV/25-26/005
+2025-06-15,SAL/2025-26/0005,Sales,Output SGST,0.00,72000.00,Sale to Patil Retail LLP,INV/25-26/005
+2025-06-20,PUR/2025-26/0004,Purchase,Purchases - Stock-in-Trade,600000.00,0.00,Power adapters from Rathod Components,RC/145
+2025-06-20,PUR/2025-26/0004,Purchase,Input IGST,108000.00,0.00,Power adapters from Rathod Components,RC/145
+2025-06-20,PUR/2025-26/0004,Purchase,Rathod Components Pvt Ltd,0.00,708000.00,Power adapters from Rathod Components,RC/145
+2025-07-20,JV/2025-26/0003,Journal,Output CGST,72000.00,0.00,GSTR-3B June 2025: ITC set-off and cash payment,GSTR3B-JUN25
+2025-07-20,JV/2025-26/0003,Journal,Output SGST,72000.00,0.00,GSTR-3B June 2025: ITC set-off and cash payment,GSTR3B-JUN25
+2025-07-20,JV/2025-26/0003,Journal,Input IGST,0.00,108000.00,GSTR-3B June 2025: ITC set-off and cash payment,GSTR3B-JUN25
+2025-07-20,JV/2025-26/0003,Journal,HDFC Bank Current A/c,0.00,36000.00,GSTR-3B June 2025: ITC set-off and cash payment,GSTR3B-JUN25
+2025-08-20,PMT/2025-26/0008,Payment,Penalties and Fines,2000.00,0.00,Penalty for delayed filing of a statutory form,PEN-0825
+2025-08-20,PMT/2025-26/0008,Payment,HDFC Bank Current A/c,0.00,2000.00,Penalty for delayed filing of a statutory form,PEN-0825
+2025-09-10,SAL/2025-26/0006,Sales,Kaveri Systems Pvt Ltd,1062000.00,0.00,Sale to Kaveri Systems (Karnataka),INV/25-26/006
+2025-09-10,SAL/2025-26/0006,Sales,Sales - Goods,0.00,900000.00,Sale to Kaveri Systems (Karnataka),INV/25-26/006
+2025-09-10,SAL/2025-26/0006,Sales,Output IGST,0.00,162000.00,Sale to Kaveri Systems (Karnataka),INV/25-26/006
+2025-09-15,PMT/2025-26/0009,Payment,Advance Tax,60000.00,0.00,Advance tax instalment 2,ADV-TAX-Q2
+2025-09-15,PMT/2025-26/0009,Payment,HDFC Bank Current A/c,0.00,60000.00,Advance tax instalment 2,ADV-TAX-Q2
+2025-10-05,PUR/2025-26/0005,Purchase,Purchases - Stock-in-Trade,700000.00,0.00,USB-C cables from Rathod Components,RC/190
+2025-10-05,PUR/2025-26/0005,Purchase,Input IGST,126000.00,0.00,USB-C cables from Rathod Components,RC/190
+2025-10-05,PUR/2025-26/0005,Purchase,Rathod Components Pvt Ltd,0.00,826000.00,USB-C cables from Rathod Components,RC/190
+2025-10-20,PMT/2025-26/0010,Payment,Output IGST,162000.00,0.00,GSTR-3B September 2025: IGST paid in cash,GSTR3B-SEP25
+2025-10-20,PMT/2025-26/0010,Payment,HDFC Bank Current A/c,0.00,162000.00,GSTR-3B September 2025: IGST paid in cash,GSTR3B-SEP25
+2025-11-10,PUR/2025-26/0006,Purchase,Computers,100000.00,0.00,3 laptops from Infotech Solutions (put to use 15-11-2025),IT/301
+2025-11-10,PUR/2025-26/0006,Purchase,Input CGST,9000.00,0.00,3 laptops from Infotech Solutions (put to use 15-11-2025),IT/301
+2025-11-10,PUR/2025-26/0006,Purchase,Input SGST,9000.00,0.00,3 laptops from Infotech Solutions (put to use 15-11-2025),IT/301
+2025-11-10,PUR/2025-26/0006,Purchase,Infotech Solutions Pvt Ltd,0.00,118000.00,3 laptops from Infotech Solutions (put to use 15-11-2025),IT/301
+2025-12-12,SAL/2025-26/0007,Sales,Patil Retail LLP,2124000.00,0.00,Sale to Patil Retail LLP,INV/25-26/007
+2025-12-12,SAL/2025-26/0007,Sales,Sales - Goods,0.00,1800000.00,Sale to Patil Retail LLP,INV/25-26/007
+2025-12-12,SAL/2025-26/0007,Sales,Output CGST,0.00,162000.00,Sale to Patil Retail LLP,INV/25-26/007
+2025-12-12,SAL/2025-26/0007,Sales,Output SGST,0.00,162000.00,Sale to Patil Retail LLP,INV/25-26/007
+2025-12-15,PMT/2025-26/0011,Payment,Advance Tax,80000.00,0.00,Advance tax instalment 3,ADV-TAX-Q3
+2025-12-15,PMT/2025-26/0011,Payment,HDFC Bank Current A/c,0.00,80000.00,Advance tax instalment 3,ADV-TAX-Q3
+2026-01-20,JV/2025-26/0004,Journal,Output CGST,162000.00,0.00,GSTR-3B December 2025: ITC set-off and cash payment,GSTR3B-DEC25
+2026-01-20,JV/2025-26/0004,Journal,Output SGST,162000.00,0.00,GSTR-3B December 2025: ITC set-off and cash payment,GSTR3B-DEC25
+2026-01-20,JV/2025-26/0004,Journal,Input IGST,0.00,126000.00,GSTR-3B December 2025: ITC set-off and cash payment,GSTR3B-DEC25
+2026-01-20,JV/2025-26/0004,Journal,Input CGST,0.00,9000.00,GSTR-3B December 2025: ITC set-off and cash payment,GSTR3B-DEC25
+2026-01-20,JV/2025-26/0004,Journal,Input SGST,0.00,9000.00,GSTR-3B December 2025: ITC set-off and cash payment,GSTR3B-DEC25
+2026-01-20,JV/2025-26/0004,Journal,HDFC Bank Current A/c,0.00,180000.00,GSTR-3B December 2025: ITC set-off and cash payment,GSTR3B-DEC25
+2026-02-14,SAL/2025-26/0008,Sales,Gulf Gadgets LLC,400000.00,0.00,"Export to Gulf Gadgets LLC, Dubai under LUT",INV/25-26/008
+2026-02-14,SAL/2025-26/0008,Sales,Export Sales,0.00,400000.00,"Export to Gulf Gadgets LLC, Dubai under LUT",INV/25-26/008
+2026-03-10,PUR/2025-26/0007,Purchase,Purchases - Stock-in-Trade,300000.00,0.00,Power adapters from Rathod Components,RC/240
+2026-03-10,PUR/2025-26/0007,Purchase,Input IGST,54000.00,0.00,Power adapters from Rathod Components,RC/240
+2026-03-10,PUR/2025-26/0007,Purchase,Rathod Components Pvt Ltd,0.00,354000.00,Power adapters from Rathod Components,RC/240
+2026-03-14,PMT/2025-26/0012,Payment,Advance Tax,80000.00,0.00,Advance tax instalment 4,ADV-TAX-Q4
+2026-03-14,PMT/2025-26/0012,Payment,HDFC Bank Current A/c,0.00,80000.00,Advance tax instalment 4,ADV-TAX-Q4
+2026-03-25,RCT/2025-26/0002,Receipt,HDFC Bank Current A/c,2800000.00,0.00,Receipts from Patil Retail LLP (summary),RCPT-PATIL-FY
+2026-03-25,RCT/2025-26/0002,Receipt,Patil Retail LLP,0.00,2800000.00,Receipts from Patil Retail LLP (summary),RCPT-PATIL-FY
+2026-03-26,PMT/2025-26/0013,Payment,Rathod Components Pvt Ltd,2124000.00,0.00,Payments to suppliers (summary),PAY-SUPPLIERS-FY
+2026-03-26,PMT/2025-26/0013,Payment,Mehta Packaging,56000.00,0.00,Payments to suppliers (summary),PAY-SUPPLIERS-FY
+2026-03-26,PMT/2025-26/0013,Payment,Infotech Solutions Pvt Ltd,118000.00,0.00,Payments to suppliers (summary),PAY-SUPPLIERS-FY
+2026-03-26,PMT/2025-26/0013,Payment,Annapurna Caterers,21000.00,0.00,Payments to suppliers (summary),PAY-SUPPLIERS-FY
+2026-03-26,PMT/2025-26/0013,Payment,HDFC Bank Current A/c,0.00,2319000.00,Payments to suppliers (summary),PAY-SUPPLIERS-FY
+2026-03-27,RCT/2025-26/0003,Receipt,HDFC Bank Current A/c,1298000.00,0.00,Receipts from Kaveri Systems (summary),RCPT-KAVERI-FY
+2026-03-27,RCT/2025-26/0003,Receipt,Kaveri Systems Pvt Ltd,0.00,1298000.00,Receipts from Kaveri Systems (summary),RCPT-KAVERI-FY
+2026-03-28,RCT/2025-26/0004,Receipt,HDFC Bank Current A/c,400000.00,0.00,Export proceeds from Gulf Gadgets LLC,FIRC-GULF-0328
+2026-03-28,RCT/2025-26/0004,Receipt,Gulf Gadgets LLC,0.00,400000.00,Export proceeds from Gulf Gadgets LLC,FIRC-GULF-0328
+2026-03-31,PMT/2025-26/0014,Payment,Salaries and Wages,660000.00,0.00,Salaries May 2025 - March 2026 (summary) less TDS,SAL-MAY25-MAR26
+2026-03-31,PMT/2025-26/0014,Payment,TDS Payable - 192 Salary,0.00,22000.00,Salaries May 2025 - March 2026 (summary) less TDS,SAL-MAY25-MAR26
+2026-03-31,PMT/2025-26/0014,Payment,HDFC Bank Current A/c,0.00,638000.00,Salaries May 2025 - March 2026 (summary) less TDS,SAL-MAY25-MAR26
+2026-03-31,PMT/2025-26/0015,Payment,Rent,605000.00,0.00,Rent May 2025 - March 2026 (summary) less TDS,RENT-MAY25-MAR26
+2026-03-31,PMT/2025-26/0015,Payment,TDS Payable - 194I Rent,0.00,60500.00,Rent May 2025 - March 2026 (summary) less TDS,RENT-MAY25-MAR26
+2026-03-31,PMT/2025-26/0015,Payment,HDFC Bank Current A/c,0.00,544500.00,Rent May 2025 - March 2026 (summary) less TDS,RENT-MAY25-MAR26
+2026-03-31,JV/2025-26/0005,Journal,Input CGST,54450.00,0.00,Reverse-charge GST on rent May 2025 - March 2026,RCM-MAY25-MAR26
+2026-03-31,JV/2025-26/0005,Journal,Input SGST,54450.00,0.00,Reverse-charge GST on rent May 2025 - March 2026,RCM-MAY25-MAR26
+2026-03-31,JV/2025-26/0005,Journal,RCM CGST Payable,0.00,54450.00,Reverse-charge GST on rent May 2025 - March 2026,RCM-MAY25-MAR26
+2026-03-31,JV/2025-26/0005,Journal,RCM SGST Payable,0.00,54450.00,Reverse-charge GST on rent May 2025 - March 2026,RCM-MAY25-MAR26
+2026-03-31,PMT/2025-26/0016,Payment,TDS Payable - 192 Salary,20000.00,0.00,TDS deposited for May 2025 - February 2026,TDS-MAY25-FEB26
+2026-03-31,PMT/2025-26/0016,Payment,TDS Payable - 194I Rent,55000.00,0.00,TDS deposited for May 2025 - February 2026,TDS-MAY25-FEB26
+2026-03-31,PMT/2025-26/0016,Payment,HDFC Bank Current A/c,0.00,75000.00,TDS deposited for May 2025 - February 2026,TDS-MAY25-FEB26
+2026-03-31,RCT/2025-26/0005,Receipt,HDFC Bank Current A/c,8000.00,0.00,Interest on savings sweep credited by bank,INT-FY2526
+2026-03-31,RCT/2025-26/0005,Receipt,Interest Income,0.00,8000.00,Interest on savings sweep credited by bank,INT-FY2526
+2026-03-31,JV/2025-26/0006,Journal,Payment to Auditors - Statutory Audit,50000.00,0.00,Provision for statutory audit fee FY 2025-26,AUDIT-FEE-PROV
+2026-03-31,JV/2025-26/0006,Journal,Audit Fees Payable,0.00,50000.00,Provision for statutory audit fee FY 2025-26,AUDIT-FEE-PROV
+2026-03-31,JV/2025-26/0007,Journal,Changes in Inventories,400000.00,0.00,"Opening stock transferred and closing stock (physical count, at cost) recorded",STOCK-FY2526
+2026-03-31,JV/2025-26/0007,Journal,Stock-in-Trade,0.00,400000.00,"Opening stock transferred and closing stock (physical count, at cost) recorded",STOCK-FY2526
+2026-03-31,JV/2025-26/0007,Journal,Stock-in-Trade,550000.00,0.00,"Opening stock transferred and closing stock (physical count, at cost) recorded",STOCK-FY2526
+2026-03-31,JV/2025-26/0007,Journal,Changes in Inventories,0.00,550000.00,"Opening stock transferred and closing stock (physical count, at cost) recorded",STOCK-FY2526
+2026-03-31,JV/2025-26/0008,Journal,Depreciation,123730.05,0.00,Depreciation for FY 2025-26 as per Schedule II (WDV),DEP-2025-26
+2026-03-31,JV/2025-26/0008,Journal,Accumulated Depreciation - Furniture and Fixtures,0.00,62127.73,Depreciation for FY 2025-26 as per Schedule II (WDV),DEP-2025-26
+2026-03-31,JV/2025-26/0008,Journal,Accumulated Depreciation - Computers,0.00,61602.32,Depreciation for FY 2025-26 as per Schedule II (WDV),DEP-2025-26
+2026-03-31,JV/2025-26/0009,Journal,Deferred Tax Liability (Net),15166.39,0.00,Deferred tax on depreciation timing difference (AS 22),DT-FY2526
+2026-03-31,JV/2025-26/0009,Journal,Deferred Tax,0.00,15166.39,Deferred tax on depreciation timing difference (AS 22),DT-FY2526
+2026-03-31,JV/2025-26/0010,Journal,Current Tax,260119.00,0.00,Provision for income tax FY 2025-26 (s.115BAA),TAX-PROV-FY2526
+2026-03-31,JV/2025-26/0010,Journal,Provision for Income Tax,0.00,260119.00,Provision for income tax FY 2025-26 (s.115BAA),TAX-PROV-FY2526

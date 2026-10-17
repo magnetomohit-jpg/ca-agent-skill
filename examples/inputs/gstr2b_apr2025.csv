@@ -1,0 +1,5 @@
+gstin,supplier,invoice_no,invoice_date,doc_type,taxable_value,igst,cgst,sgst,cess,itc_availability
+24AAGCR9012M1Z6,Rathod Components Pvt Ltd,RC-101,05-04-2025,INV,500000,90000,0,0,0,Yes
+27AACFM3456N1ZX,Mehta Packaging,MP/55,08-04-2025,INV,50000,0,3000,3000,0,Yes
+27AAFCA2468B1ZZ,Annapurna Caterers,AC/77,16-04-2025,INV,20000,0,500,500,0,Yes
+27AAJFS1357K1ZU,Speedy Couriers,SC/0009,29-04-2025,INV,5000,0,450,450,0,Yes

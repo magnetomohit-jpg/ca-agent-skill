@@ -1,0 +1,23 @@
+{
+  "skill_name": "ca-agent",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "We're a Pune-based pvt ltd (GSTIN 27AAKCS1234F1ZI), monthly GST filer. The books are in examples/demo-company. Prepare GSTR-1 and GSTR-3B for April 2025, reconcile ITC with the GSTR-2B in examples/inputs/gstr2b_apr2025.csv, and tell me how much cash to pay and by when.",
+      "expected_output": "Uses gst.py check/gstr1/reco/gstr3b; reports cash payable Rs 19,200 (9,300 forward charge SGST + 9,900 RCM), due 20 May 2025; flags the Speedy Couriers bill in 2B but not in books and the blocked catering ITC; gives a portal filing checklist without asking for credentials.",
+      "files": ["examples/demo-company", "examples/inputs/gstr2b_apr2025.csv"]
+    },
+    {
+      "id": 2,
+      "prompt": "Finalise FY 2025-26 accounts for the company in examples/demo-company - I need the balance sheet, P&L and cash flow in Schedule III format as an Excel file, plus the income tax computation for ITR-6 under 115BAA. Advance tax paid was 2.5 lakh.",
+      "expected_output": "Runs validate, financials.py --out-dir (xlsx), and company tax via company-draft/company; balance sheet tallies at Rs 33,37,965.34; total income Rs 10,33,530, tax Rs 2,60,119, 234C interest Rs 1,931, balance payable Rs 12,050; mentions ITR-6 due 21 Nov 2026 (extended), DSC verification and disclosures still needed.",
+      "files": ["examples/demo-company"]
+    },
+    {
+      "id": 3,
+      "prompt": "i'm salaried, 18.5 lakh CTC (gross salary 18,00,000), pay 25k rent/month in mumbai with 3.6L HRA exemption possible, 1.5L in PPF+ELSS, 25k health insurance, and I sold some mutual funds with 2L long term gain. which regime is better for FY 2025-26 and which ITR do i file?",
+      "expected_output": "Runs income_tax.py individual with both regimes, applies 12.5% LTCG over 1.25 lakh, compares totals and recommends a regime with the saving; picks ITR-2 (capital gains beyond the ITR-1 limit), due 31 July 2026.",
+      "files": []
+    }
+  ]
+}

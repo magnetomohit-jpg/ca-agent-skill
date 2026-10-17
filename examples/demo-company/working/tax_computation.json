@@ -1,0 +1,30 @@
+{
+  "fy": "2025-26",
+  "regime": "115BAA",
+  "business_income": 1025530.0,
+  "gross_total_income": 1033530.0,
+  "total_income": 1033530.0,
+  "tax": {
+    "rate": 0.22,
+    "tax_normal": 227376.6,
+    "tax_special": 0.0,
+    "base": 227376.6,
+    "surcharge": 22737.66,
+    "marginal_relief": 0.0,
+    "cess": 10004.57,
+    "total": 260119.0
+  },
+  "mat": null,
+  "mat_credit_created": 0.0,
+  "mat_credit_used": 0.0,
+  "liability": 260119.0,
+  "tds_tcs": 0.0,
+  "advance_tax": 250000.0,
+  "interest_234a": 0.0,
+  "interest_234b": 0.0,
+  "interest_234c": 1931.0,
+  "fee_234f": 0.0,
+  "balance_payable": 12050.0,
+  "due_date": "2026-11-21",
+  "notes": []
+}

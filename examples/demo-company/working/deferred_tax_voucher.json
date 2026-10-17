@@ -1,0 +1,18 @@
+[
+  {
+    "date": "2026-03-31",
+    "type": "Journal",
+    "ref": "DT-FY2526",
+    "narration": "Deferred tax on depreciation timing difference (AS 22)",
+    "lines": [
+      {
+        "account": "Deferred Tax Liability (Net)",
+        "dr": 15166.39
+      },
+      {
+        "account": "Deferred Tax",
+        "cr": 15166.39
+      }
+    ]
+  }
+]

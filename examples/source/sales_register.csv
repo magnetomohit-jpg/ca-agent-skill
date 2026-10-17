@@ -1,0 +1,10 @@
+date,invoice_no,doc_type,original_invoice_no,customer,gstin,place_of_supply,supply_type,hsn,description,uqc,qty,taxable_value,gst_rate,igst,cgst,sgst,cess,reverse_charge,port_code,shipping_bill_no
+2025-04-10,INV/25-26/001,INV,,Patil Retail LLP,27AAQFP4321C1ZD,27,TAX,850440,Power adapters 65W,NOS,400,300000,18,,27000,27000,,N,,
+2025-04-15,INV/25-26/002,INV,,Kaveri Systems Pvt Ltd,29AAFCK5678L1ZQ,29,TAX,854442,USB-C cables,NOS,2000,200000,18,36000,,,,N,,
+2025-04-20,INV/25-26/003,INV,,Walk-in customer (Bengaluru),,29,TAX,850440,Power adapters 65W,NOS,160,120000,18,21600,,,,N,,
+2025-04-22,INV/25-26/004,INV,,Cash sales,,27,TAX,854442,USB-C cables,NOS,400,40000,18,,3600,3600,,N,,
+2025-04-28,CN/25-26/001,CN,INV/25-26/001,Patil Retail LLP,27AAQFP4321C1ZD,27,TAX,850440,Return of damaged adapters,NOS,,20000,18,,1800,1800,,N,,
+2025-06-15,INV/25-26/005,INV,,Patil Retail LLP,27AAQFP4321C1ZD,27,TAX,850440,Power adapters 65W,NOS,1000,800000,18,,72000,72000,,N,,
+2025-09-10,INV/25-26/006,INV,,Kaveri Systems Pvt Ltd,29AAFCK5678L1ZQ,29,TAX,854442,USB-C cables,NOS,9000,900000,18,162000,,,,N,,
+2025-12-12,INV/25-26/007,INV,,Patil Retail LLP,27AAQFP4321C1ZD,27,TAX,850440,Power adapters 65W,NOS,2400,1800000,18,,162000,162000,,N,,
+2026-02-14,INV/25-26/008,INV,,Gulf Gadgets LLC,,96,EXPWOP,854442,USB-C cables (export under LUT),NOS,4000,400000,0,,,,,N,INNSA1,4471235

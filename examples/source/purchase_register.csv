@@ -1,0 +1,10 @@
+date,invoice_no,doc_type,original_invoice_no,supplier,gstin,place_of_supply,supply_type,hsn,description,uqc,qty,taxable_value,gst_rate,igst,cgst,sgst,cess,reverse_charge,itc,boe_no
+2025-04-05,RC/101,INV,,Rathod Components Pvt Ltd,24AAGCR9012M1Z6,27,TAX,850440,Power adapters,NOS,1000,500000,18,90000,,,,N,eligible,
+2025-04-08,MP/55,INV,,Mehta Packaging,27AACFM3456N1ZX,27,TAX,481910,Corrugated boxes,NOS,5000,50000,12,,3000,3000,,N,eligible,
+2025-04-16,AC/77,INV,,Annapurna Caterers,27AAFCA2468B1ZZ,27,TAX,996334,Staff lunch - outdoor catering,OTH,1,20000,5,,500,500,,N,blocked,
+2025-04-25,RENT-APR25,INV,,Anil Deshpande (landlord),,27,TAX,997212,Office rent April 2025 (RCM - unregistered landlord),OTH,1,55000,18,,4950,4950,,Y,eligible,
+2025-06-20,RC/145,INV,,Rathod Components Pvt Ltd,24AAGCR9012M1Z6,27,TAX,850440,Power adapters,NOS,1200,600000,18,108000,,,,N,eligible,
+2025-10-05,RC/190,INV,,Rathod Components Pvt Ltd,24AAGCR9012M1Z6,27,TAX,854442,USB-C cables,NOS,14000,700000,18,126000,,,,N,eligible,
+2025-11-10,IT/301,INV,,Infotech Solutions Pvt Ltd,27AADCI7788Q1ZH,27,TAX,847130,Laptops (capital goods),NOS,3,100000,18,,9000,9000,,N,eligible,
+2026-03-10,RC/240,INV,,Rathod Components Pvt Ltd,24AAGCR9012M1Z6,27,TAX,850440,Power adapters,NOS,600,300000,18,54000,,,,N,eligible,
+2026-03-31,RENT-MAY25-MAR26,INV,,Anil Deshpande (landlord),,27,TAX,997212,Office rent May 2025 - Mar 2026 (RCM summary),OTH,11,605000,18,,54450,54450,,Y,eligible,

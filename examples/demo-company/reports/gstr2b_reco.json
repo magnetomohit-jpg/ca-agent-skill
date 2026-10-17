@@ -1,0 +1,52 @@
+{
+  "summary": {
+    "Matched": {
+      "count": 3,
+      "books": 97000.0,
+      "gstr2b": 97000.0
+    },
+    "In GSTR-2B, not in books": {
+      "count": 1,
+      "books": 0.0,
+      "gstr2b": 900.0
+    }
+  },
+  "detail": [
+    {
+      "status": "Matched",
+      "gstin": "24AAGCR9012M1Z6",
+      "supplier": "Rathod Components Pvt Ltd",
+      "invoice": "RC/101",
+      "books_tax": 90000.0,
+      "gstr2b_tax": 90000.0,
+      "difference": 0.0
+    },
+    {
+      "status": "Matched",
+      "gstin": "27AACFM3456N1ZX",
+      "supplier": "Mehta Packaging",
+      "invoice": "MP/55",
+      "books_tax": 6000.0,
+      "gstr2b_tax": 6000.0,
+      "difference": 0.0
+    },
+    {
+      "status": "Matched",
+      "gstin": "27AAFCA2468B1ZZ",
+      "supplier": "Annapurna Caterers",
+      "invoice": "AC/77",
+      "books_tax": 1000.0,
+      "gstr2b_tax": 1000.0,
+      "difference": 0.0
+    },
+    {
+      "status": "In GSTR-2B, not in books",
+      "gstin": "27AAJFS1357K1ZU",
+      "supplier": "Speedy Couriers",
+      "invoice": "SC/0009",
+      "books_tax": 0.0,
+      "gstr2b_tax": 900.0,
+      "difference": -900.0
+    }
+  ]
+}

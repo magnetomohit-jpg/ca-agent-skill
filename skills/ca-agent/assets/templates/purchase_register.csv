@@ -1,0 +1,1 @@
+date,invoice_no,doc_type,original_invoice_no,supplier,gstin,place_of_supply,supply_type,hsn,description,uqc,qty,taxable_value,gst_rate,igst,cgst,sgst,cess,reverse_charge,itc,boe_no
