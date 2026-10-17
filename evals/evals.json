@@ -4,20 +4,60 @@
     {
       "id": 1,
       "prompt": "We're a Pune-based pvt ltd (GSTIN 27AAKCS1234F1ZI), monthly GST filer. The books are in examples/demo-company. Prepare GSTR-1 and GSTR-3B for April 2025, reconcile ITC with the GSTR-2B in examples/inputs/gstr2b_apr2025.csv, and tell me how much cash to pay and by when.",
-      "expected_output": "Uses gst.py check/gstr1/reco/gstr3b; reports cash payable Rs 19,200 (9,300 forward charge SGST + 9,900 RCM), due 20 May 2025; flags the Speedy Couriers bill in 2B but not in books and the blocked catering ITC; gives a portal filing checklist without asking for credentials.",
-      "files": ["examples/demo-company", "examples/inputs/gstr2b_apr2025.csv"]
+      "expected_output": "Uses gst.py check/gstr1/reco/gstr3b; reports cash payable Rs 19,200 (9,300 forward charge after ITC + 9,900 RCM), due 20 May 2025 (GSTR-1 11 May 2025); flags the Speedy Couriers bill in 2B but not in books and the blocked catering ITC; notes the books already hold the April set-off (posts nothing) and, since the dates have passed, gives the late position (gstr3b --filing-date: interest u/s 50, late fee, s.16(4) cut-off 30 Nov 2026); gives a portal filing checklist without asking for credentials.",
+      "files": [
+        "examples/demo-company",
+        "examples/inputs/gstr2b_apr2025.csv"
+      ],
+      "expectations": [
+        "Produces GSTR-1 data for April 2025 with B2B, B2CL/B2CS and HSN summary tables",
+        "Produces GSTR-3B tables 3.1 (outward + RCM), 4 (ITC) and 6.1 (payment of tax) for April 2025",
+        "States the total cash to deposit for April 2025 GSTR-3B as Rs 19,200",
+        "Splits the cash correctly: SGST Rs 9,300 forward charge after ITC set-off, plus reverse-charge tax Rs 9,900 (CGST 4,950 + SGST 4,950) paid in cash",
+        "Gives the GSTR-3B due date as 20 May 2025 (and GSTR-1 as 11 May 2025)",
+        "Flags the Speedy Couriers invoice SC/0009 (Rs 900 tax) as appearing in GSTR-2B but missing from the books",
+        "Treats the Annapurna Caterers ITC (Rs 1,000) as blocked under s.17(5) - not claimed, or reversed in table 4(B)(1)",
+        "Recognises that the April 2025 due dates have already passed as of today (17 Oct 2026) and flags interest u/s 50 and late fee if the returns are not yet filed",
+        "Does not ask for GST portal credentials/OTP; gives the user a filing and payment checklist (PMT-06 / challan) to do themselves"
+      ]
     },
     {
       "id": 2,
       "prompt": "Finalise FY 2025-26 accounts for the company in examples/demo-company - I need the balance sheet, P&L and cash flow in Schedule III format as an Excel file, plus the income tax computation for ITR-6 under 115BAA. Advance tax paid was 2.5 lakh.",
-      "expected_output": "Runs validate, financials.py --out-dir (xlsx), and company tax via company-draft/company; balance sheet tallies at Rs 33,37,965.34; total income Rs 10,33,530, tax Rs 2,60,119, 234C interest Rs 1,931, balance payable Rs 12,050; mentions ITR-6 due 21 Nov 2026 (extended), DSC verification and disclosures still needed.",
-      "files": ["examples/demo-company"]
+      "expected_output": "Recognises the books are already closed (depreciation, deferred tax, tax provision posted) and verifies rather than re-posts; runs validate, financials.py --out-dir (xlsx) and company tax via company-draft/company; balance sheet tallies at Rs 33,37,965.34 (or 30,87,965.34 with advance tax netted, AS 22 para 29); total income Rs 10,33,530 (incl. s.40A(3) Rs 12,000), tax Rs 2,60,119 (2,60,120 rounded u/s 288B), 234C interest Rs 1,931 (1,930), balance payable Rs 12,050; flags s.43B(h) on the MSME creditor; ITR-6 due 31 Oct 2026 (21 Nov 2026 if the extension holds), DSC verification and disclosures still needed.",
+      "files": [
+        "examples/demo-company"
+      ],
+      "expectations": [
+        "Produces an .xlsx file containing the Balance Sheet, Statement of Profit and Loss and Cash Flow Statement",
+        "Statements follow the Schedule III (Division I) layout: Equity and Liabilities / Assets headings with Schedule III line items and note references",
+        "Balance sheet tallies: Rs 33,37,965.34 on both sides, or Rs 30,87,965.34 if advance tax is netted against the tax provision (AS 22 para 29)",
+        "Reports profit before tax Rs 9,59,269.95 and profit for the year Rs 7,14,317.34 (rupee rounding acceptable)",
+        "Computes total income as Rs 10,33,530, including the s.40A(3) disallowance of the Rs 12,000 cash payment",
+        "Computes tax under s.115BAA as Rs 2,60,119 (Rs 2,60,120 if rounded u/s 288B): 22% + 10% surcharge + 4% cess",
+        "Computes interest u/s 234C as Rs 1,931 (Rs 1,930 if rounded) using the dated advance-tax instalments",
+        "Computes balance self-assessment tax payable as Rs 12,050 after Rs 2,50,000 advance tax",
+        "Does not post depreciation, deferred tax or the current-tax provision a second time (they are already in the journal)",
+        "States the ITR-6 due date (31 Oct 2026, or 21 Nov 2026 citing the extension) and that ITR-6 must be verified with a DSC",
+        "Lists the disclosures or notes still to be completed by the user (e.g. related parties, ageing schedules, MSME dues, share capital and promoter holding)"
+      ]
     },
     {
       "id": 3,
       "prompt": "i'm salaried, 18.5 lakh CTC (gross salary 18,00,000), pay 25k rent/month in mumbai with 3.6L HRA exemption possible, 1.5L in PPF+ELSS, 25k health insurance, and I sold some mutual funds with 2L long term gain. which regime is better for FY 2025-26 and which ITR do i file?",
-      "expected_output": "Runs income_tax.py individual with both regimes, applies 12.5% LTCG over 1.25 lakh, compares totals and recommends a regime with the saving; picks ITR-2 (capital gains beyond the ITR-1 limit), due 31 July 2026.",
-      "files": []
+      "expected_output": "Rejects the Rs 3.6 lakh HRA exemption as impossible on Rs 3 lakh rent (rule 2A: rent less 10% of salary) and recomputes it; runs income_tax.py individual for both regimes, applies 12.5% LTCG over 1.25 lakh; new regime Rs 1,60,550 beats the old (Rs 1,93,830 on the user's figures, about Rs 2.34 lakh with corrected HRA); picks ITR-2 (LTCG beyond the ITR-1 limit); notes the 31 July 2026 due date has passed, so a belated return by 31 Dec 2026 with the s.234F fee, locked into the new regime.",
+      "files": [],
+      "expectations": [
+        "Computes old-regime tax correctly: Rs 1,93,830 including cess on the user's figures, or a figure that reconciles to it through a stated adjustment (e.g. professional tax, corrected HRA)",
+        "Computes new-regime tax as Rs 1,60,550 including cess",
+        "Recommends the new regime and quantifies the saving",
+        "Taxes LTCG at 12.5% only on the gain above Rs 1.25 lakh (Rs 75,000 taxable, Rs 9,375 tax before cess)",
+        "Recommends ITR-2 because LTCG above Rs 1.25 lakh rules out ITR-1",
+        "Challenges the Rs 3.6 lakh HRA exemption: it cannot exceed rent paid (Rs 3 lakh a year) less 10% of salary",
+        "Mentions the original due date of 31 July 2026",
+        "Recognises that 31 July 2026 has already passed as of today (17 Oct 2026) and gives the belated-return deadline of 31 Dec 2026 with the s.234F fee",
+        "Notes that a belated return cannot opt for the old regime (the option must be exercised in a return filed by the s.139(1) due date)"
+      ]
     }
   ]
 }

@@ -23,7 +23,25 @@ cross-checks a reviewer would (books vs GST registers, balance sheet tally, cash
   you cannot certify anything.
 - **No invented numbers.** If an invoice, balance or date is missing, ask, or post it to the
   Suspense Account and list it as an open item. A balance sheet that tallies on guessed numbers
-  is worse than one with a clearly flagged gap.
+  is worse than one with a clearly flagged gap. The same goes for figures the user quotes: test them
+  against their legal limits before using them, because the scripts take inputs at face value. For
+  example, an HRA exemption can never exceed rent paid less 10% of basic salary plus DA, so "3.6L HRA exemption"
+  on Rs 3 lakh of rent is impossible and must be recomputed, not carried into the comparison.
+- **Look before you post.** Books that come from a client or a previous accountant often already hold
+  the GST set-off, depreciation, deferred tax or the tax provision. Check the ledger first (`books.py tb`,
+  `ledger --account "Depreciation"`). If the entry is there, rerun the script to verify it (for example
+  `depreciation.py` without `--voucher`/`--write-next`), and post only a difference. `books.py post`
+  rejects a voucher only when its type and ref already exist, so a re-post under a new ref doubles the figure.
+- **Measure every due date against today.** Users often ask about a past period: a catch-up filing, or a
+  return they are not sure was filed. When the due date has passed, say so first and give the late
+  position. The books may also show the tax was paid on time, in which case say so: the user may only need a tie-out.
+  - GST: rerun `gstr3b --filing-date <today>` for s.50 interest and the late fee, and warn about the
+    s.16(4) ITC cut-off (30 November after the FY).
+  - Income tax: a belated return is due by 31 December, with the s.234F fee and s.234A interest.
+    An individual without business income can pick the old regime only in a return filed by the
+    s.139(1) due date (s.115BAC(6)), so a belated return is locked into the new regime.
+  - ROC: an AGM not held by its due date is a default in itself. The AOC-4 (30 days) and MGT-7
+    (60 days) clocks then run from the date the AGM should have been held.
 - **Law changes every year.** Rates, slabs, thresholds and due dates live in `scripts/rules.py`,
   with `VERIFIED_ON` (last checked 2026-10-17). If today is well past that date, if a Budget,
   Finance Act or CBDT/CBIC/MCA notification has come out since, or if the user names a rule you
@@ -52,7 +70,11 @@ Every entity and financial year gets one folder, the single source of truth that
 Scripts live in `scripts/` next to this file; run them as `python <skill-dir>/scripts/<name>.py`.
 Each prints a markdown report. `--json` gives machine-readable output, and `--out-dir DIR` saves
 `.md`/`.json` (and `.xlsx` for the financial statements) for the user. Write deliverables to
-`<books>/reports/` and scratch files (voucher JSON, tax inputs) to `<books>/working/`.
+`<books>/reports/` and scratch files (voucher JSON, tax inputs) to `<books>/working/`. An individual's
+tax question has no books folder: keep the input JSON and the outputs together in one working folder.
+The table below plus `python <script> --help` (the script's docstring and flags; for gst.py one call
+covers every subcommand) is the full interface, and the workflows note what each command does not do,
+so there is no need to read the source. On Windows, give Python native paths (`F:\...`), even from Git Bash.
 
 | Task | Command |
 |---|---|
@@ -108,18 +130,25 @@ accounts, dates outside the year and negative cash. Nothing downstream is reliab
    HSN (B2B and B2C tabs) and documents-issued tables, matching the portal tiles.
 3. `gst.py reco ... --gstr2b 2b.csv` checks ITC. It can be claimed only if the invoice appears in GSTR-2B
    (sec 16(2)(aa)). Act on each bucket: chase the supplier, accept or reject in IMS, or book the missing bill.
+   The reco matches invoices only and does not judge eligibility. A bill blocked under 17(5) still shows as
+   "Matched" (gstr3b reverses it in 4(B)(1)), and RCM lines are left out because they never appear in 2B.
+   Remember both when you explain how the 2B figure becomes net ITC.
    `references/gst.md` explains how to turn the portal's GSTR-2B Excel into the CSV.
 4. `gst.py gstr3b ... --credit-bf igst=..,cgst=..,sgst=..` (credit ledger balance carried in)
    [`--reverse-42-43`, `--reverse-other`, `--filing-date` for interest and late fee]. It returns tables
    3.1, 3.2, 4, 5 and 6.1, the cash to deposit, and the credit carried forward. Reverse-charge tax is
    always paid in cash.
 5. Post the set-off and payment as a Journal (debit Output GST, credit Input GST and Bank) and the RCM
-   payment. Give the user the filing checklist: GSTR-1 by the 11th (13th under QRMP); GSTR-3B by the
-   20th (22nd/24th under QRMP); returns older than three years can no longer be filed.
+   payment, unless the books already hold them (see "Look before you post"). Give the user the filing
+   checklist: GSTR-1 by the 11th (13th under QRMP); GSTR-3B by the 20th (22nd/24th under QRMP); returns
+   older than three years can no longer be filed. For a past period, add the late position from
+   `--filing-date <today>`.
 
 ## Workflow 3 - Year-end closing and financial statements
 
-Work through this checklist in order, because each step changes figures used by the next:
+Work through this checklist in order, because each step changes figures used by the next. If the trial
+balance already shows Depreciation, Deferred Tax and Current Tax, the books have been closed: treat the
+list as a review. Rerun each script to verify the posted figure, and post only corrections.
 
 1. Bank reconciliation for every account as at 31 March. Confirm debtor and creditor balances, and
    clear Suspense.
@@ -132,10 +161,15 @@ Work through this checklist in order, because each step changes figures used by 
    expenses, provision for doubtful debts.
 6. Income tax (Workflow 4), then post Current Tax against Provision for Income Tax. Deferred tax is the
    closing DTA/DTL from `depreciation.py` less the opening balance.
-7. Run `financials.py --out-dir <dir>/reports` and read its "Checks before finalising" section. Explain
-   every ratio that moved more than 25% (Schedule III requires it). Cash flow statements are not
-   required for small companies, OPCs and dormant companies (sec 2(40)); say so rather than omitting
-   one silently.
+7. Run `financials.py --out-dir <dir>/reports` and read its "Checks before finalising" section. Those
+   checks look for missing year-end entries, an uncleared Suspense and tally errors. They do not look at
+   statutory dues still unpaid at 31 March (GST and RCM payable, TDS, PF/ESI) or how old the MSME
+   creditors are, so review those yourself.
+   - Explain every ratio that moved more than 25% (Schedule III requires it). Without `--prev-books`
+     there are no comparatives, so ask for last year's audited figures and list this as an open item.
+   - Cash flow statements are not required for small companies, OPCs and dormant companies (sec 2(40)).
+     The script does not decide small-company status (sec 2(85)), so check it and say so, rather than
+     silently omitting the statement.
 8. Complete the disclosures the script cannot know about: share capital details and promoter
    shareholding, ageing of receivables, payables and CWIP, related parties (AS 18), contingent liabilities,
    MSME dues, CSR, and the Schedule III additional regulatory information. See
@@ -150,18 +184,39 @@ Work through this checklist in order, because each step changes figures used by 
    provisions), interest income moved to other sources, TDS and dated advance-tax payments. It also lists
    cash payments over Rs 10,000 for s.40A(3).
 2. Work through the draft's `todo` list with the user. The usual items are s.43B unpaid statutory dues,
-   s.43B(h) MSME dues beyond 45 days, 40(a)(ia) TDS defaults, 36(1)(va) late PF/ESI, related-party payments
-   and brought-forward losses. Edit the JSON. Under 115BAA only 80JJAA/80M deductions survive, and the script
-   enforces that.
+   40(a)(ia) TDS defaults, 36(1)(va) late PF/ESI, related-party payments and brought-forward losses.
+   s.43B(h) needs its own look, because the draft does not list the amounts:
+   - Take the MSME-tagged creditors open at 31 March, with their invoice dates.
+   - The rule covers micro and small manufacturers and service providers, not traders.
+   - The expense stays deductible this year only if it is paid within the MSMED Act s.15 period: 15 days,
+     or the agreed credit term up to 45 days. That date can fall after 31 March. Otherwise the expense is
+     allowed in the year of payment.
+   - Ask for the credit terms and payment dates. If they are unknown, show the disallowance as an
+     alternative computation.
+   Edit the JSON. Under 115BAA only 80JJAA/80M deductions survive, and the script enforces that.
 3. `income_tax.py company tax_input.json --out-dir <dir>/working` computes total income, tax under the chosen
    regime (MAT comparison under the normal regime), interest u/s 234A/B/C, the 234F fee, and the
    self-assessment tax or refund. It also lists the ITR-6 schedules to fill.
+   - Set `filing_date` in the JSON to the expected filing date. Without it, the script assumes the return
+     is filed on the due date.
+   - For companies that due date is the extended one in `rules.py` where one is recorded. If `rules.py`
+     marks the extension "verify", give the user the statutory date (31 October) as the safe deadline.
 4. Remind the user that ITR-6 must be verified with DSC. A tax audit report (if applicable) goes first,
    and Form 10-IC is needed in the first year of opting for 115BAA.
 
 **Individuals, HUFs and firms:** write a small JSON (format in `references/income-tax.md`), run
 `individual` for the old vs new regime comparison and `itr-form` for the form, tax-audit applicability and
-due date. For advance tax use `advance-tax --tax <estimate> --fy <year>`.
+due date. For advance tax use `advance-tax --tax <estimate> --fy <year>`. Know what these commands leave to you:
+- `individual` takes exemptions and deductions as given. Work out HRA first (rule 2A). "Salary" here
+  means basic plus DA. The exemption is the least of three amounts:
+  - HRA received;
+  - rent paid less 10% of salary;
+  - 50% of salary in a metro, 40% elsewhere (for FY 2025-26 the metros are Delhi, Mumbai, Kolkata
+    and Chennai).
+  If basic salary is unknown, assume one, say so, and show how the answer changes with it.
+- `individual` has no filing date. For a late return, add s.234A interest and the s.234F fee yourself.
+- `itr-form` prints to the screen only and ignores `--out-dir`, so save its output yourself if the user
+  needs a file. It does not compare the due date with today, so do that check yourself.
 
 **TDS:** `income_tax.py tds-rates` lists the sections and thresholds. Deduct at payment or credit,
 whichever is earlier, deposit by the 7th, and file quarterly returns.
