@@ -307,7 +307,7 @@ income and taxed under their own head; keys `stcg_111a`, `ltcg_112a` and `ltcg_1
 `salary.hra` is worked out under rule 2A (least of HRA received, rent less 10% of `basic_da`, and 50% of
 `basic_da` in a metro or 40% elsewhere; `"metro": true/false` overrides `city`). Metros are
 Delhi/Mumbai/Kolkata/Chennai up to FY 2025-26; from tax year 2026-27, rule 279 of the Income-tax Rules 2026
-adds Bengaluru, Hyderabad, Pune and Ahmedabad. Do not
+(Notification 22/2026, in force 1 April 2026) adds Bengaluru, Hyderabad, Pune and Ahmedabad. Do not
 also put `hra` in `exempt_allowances_old`. `filing_date` drives s.234A/B/C interest and the s.234F fee; when
 it is missing the return is taken as filed on the due date, or today (`--as-of`) if that has passed.
 `due_date` overrides the date from rules.py. A belated return is computed under both regimes but recommended

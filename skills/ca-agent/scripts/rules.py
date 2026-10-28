@@ -93,8 +93,8 @@ INDIVIDUAL = {
 # where salary = basic + DA forming part of retirement benefits (+ turnover commission).
 HRA_METRO_CITIES = {
     "2025-26": ["Delhi", "Mumbai", "Kolkata", "Chennai"],
-    # Income-tax Rules 2026, rule 279: four cities added to the 50% tier from tax year 2026-27
-    # (reported in the draft of 10-Feb-2026 and by KPMG; confirm against the notified rule text).
+    # Income-tax Rules 2026, rule 279 (Notification 22/2026, G.S.R. 198(E), 20-Mar-2026, in force
+    # 1-Apr-2026): four cities added to the 50% tier from tax year 2026-27.
     "2026-27": ["Delhi", "Mumbai", "Kolkata", "Chennai", "Bengaluru", "Hyderabad", "Pune", "Ahmedabad"],
 }
 HRA_METRO_PCT, HRA_OTHER_PCT, HRA_RENT_EXCESS_PCT = 0.50, 0.40, 0.10
