@@ -116,3 +116,7 @@ The tests rebuild the demo company and check the figures a reviewer would check 
 Inspired by [Yogesh4527/FinCA](https://github.com/Yogesh4527/FinCA), a multi-agent design for automating CA
 workflows for Indian MSMEs. This project takes the same goal and builds it as a Claude skill with working,
 tested computations.
+
+## License
+
+MIT - see [LICENSE](LICENSE). Not professional advice; review outputs before filing.

@@ -268,9 +268,31 @@ def msme_open_items(books: Books, as_of) -> list[dict]:
     return items
 
 
-def statutory_dues(books: Books, closing: dict) -> list[str]:
-    """Statutory liabilities still unpaid in the closing balances (GST net of input credit, RCM, TDS, PF/ESI/bonus)."""
+def statutory_dues(books: Books, closing: dict, as_of=None) -> list[str]:
+    """Statutory liabilities still unpaid in the closing balances (GST net of input credit, RCM, TDS, PF/ESI/bonus).
+
+    Wording and due dates follow the report date: the March return at year end, otherwise the return for the
+    period containing `as_of` (the quarter's return for QRMP filers)."""
+    import rules
+    from common import month_end, state_code_of
     msgs = []
+    as_of = as_of or books.fy_end
+    when = "at year end" if as_of == books.fy_end else f"as at {as_of}"
+    qrmp = books.company.get("gst_filing") == "qrmp"
+    period_end = month_end(as_of)
+    if qrmp:
+        while period_end.month not in (3, 6, 9, 12):
+            period_end = month_end(period_end + timedelta(days=1))
+    nxt = period_end + timedelta(days=1)
+    if qrmp:
+        state = state_code_of(books.company.get("state_code") or books.company.get("gstin", "")[:2])
+        gst_due = nxt.replace(day=22 if state in rules.QRMP_22ND_STATES else 24)
+        gst_return = f"GSTR-3B for the quarter ending {period_end.strftime('%b %Y')}"
+    else:
+        gst_due = nxt.replace(day=20)
+        gst_return = f"{period_end.strftime('%B')} GSTR-3B"
+    after_month = month_end(as_of) + timedelta(days=1)  # TDS: 7th of next month, 30 April for March
+    tds_due = after_month.replace(day=30) if as_of.month == 3 else after_month.replace(day=7)
 
     def total(tags):
         return -sum((closing.get(a["account"], ZERO) for t in tags for a in books.accounts_with_tag(t)), ZERO)
@@ -278,19 +300,19 @@ def statutory_dues(books: Books, closing: dict) -> list[str]:
     heads = ("igst", "cgst", "sgst")
     gst_net = total([f"gst_output_{h}" for h in heads] + [f"gst_input_{h}" for h in heads])
     if gst_net > 0:
-        msgs.append(f"GST payable at year end: output tax exceeds input credit by {inr(gst_net)} - confirm it was paid "
-                    "with the March GSTR-3B (due 20 April); unpaid GST is disallowed u/s 43B until paid")
+        msgs.append(f"GST payable {when}: output tax exceeds input credit by {inr(gst_net)} - confirm it is paid "
+                    f"with the {gst_return} (due {gst_due:%d %b %Y}); unpaid GST is disallowed u/s 43B until paid")
     rcm = total([f"gst_rcm_{h}" for h in heads])
     if rcm > 0:
-        msgs.append(f"Reverse-charge GST payable at year end {inr(rcm)} - payable in cash with the March GSTR-3B "
-                    "(due 20 April); the input credit is available only after payment")
+        msgs.append(f"Reverse-charge GST payable {when} {inr(rcm)} - payable in cash with the {gst_return} "
+                    f"(due {gst_due:%d %b %Y}); the input credit is available only after payment")
     tds = total(["tds_payable"])
     if tds > 0:
-        msgs.append(f"TDS payable at year end {inr(tds)} - deposit by 30 April; if deposited after the ITR due date, "
+        msgs.append(f"TDS payable {when} {inr(tds)} - deposit by {tds_due:%d %b %Y}; if deposited after the ITR due date, "
                     "30% of the expense is disallowed u/s 40(a)(ia) and interest u/s 201(1A) applies")
     other = total(["statutory_43b"])
     if other > 0:
-        msgs.append(f"PF/ESI/bonus/other statutory dues payable at year end {inr(other)} - s.43B allows them only if "
+        msgs.append(f"PF/ESI/bonus/other statutory dues payable {when} {inr(other)} - s.43B allows them only if "
                     "paid by the ITR due date; employees' PF/ESI deposited after the statutory due date is disallowed "
                     "for good u/s 36(1)(va)")
     return msgs
@@ -401,7 +423,7 @@ def checks(books: Books, cur: dict, closing: dict, as_of) -> list[str]:
     for acc in books.accounts_with_tag("suspense"):
         if closing.get(acc["account"], ZERO):
             msgs.append(f"Suspense account {acc['account']} is not cleared")
-    msgs += statutory_dues(books, closing)
+    msgs += statutory_dues(books, closing, as_of)
     for it in msme_open_items(books, as_of):
         if it["date"] is None:
             msgs.append(f"MSME creditor {it['supplier']}: {inr(it['amount'])} brought forward from last year is still "
