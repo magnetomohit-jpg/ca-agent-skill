@@ -1,0 +1,8 @@
+party,account,type,gstin,pan,state_code,msme_category,udyam_no,credit_days,tds_section,disputed,email,phone,address
+Patil Retail LLP,Patil Retail LLP,customer,27AAQFP4321C1ZD,AAQFP4321C,27,,,60,,N,accounts@patilretail.example,,"FC Road, Pune 411004"
+Kaveri Systems Pvt Ltd,Kaveri Systems Pvt Ltd,customer,29AAFCK5678L1ZQ,AAFCK5678L,29,,,45,194Q,N,finance@kaverisystems.example,,"Whitefield, Bengaluru 560066"
+Gulf Gadgets LLC,Gulf Gadgets LLC,customer,,,96,,,30,,N,ap@gulfgadgets.example,,"Deira, Dubai, UAE"
+Rathod Components Pvt Ltd,Rathod Components Pvt Ltd,supplier,24AAGCR9012M1Z6,AAGCR9012M,24,micro,UDYAM-GJ-01-0012345,45,,N,sales@rathodcomponents.example,,"GIDC Vatva, Ahmedabad 382445"
+Mehta Packaging,Mehta Packaging,supplier,27AACFM3456N1ZX,AACFM3456N,27,,,30,194C,N,mehtapack@example.com,,"Bhosari MIDC, Pune 411026"
+Infotech Solutions Pvt Ltd,Infotech Solutions Pvt Ltd,supplier,27AADCI7788Q1ZH,AADCI7788Q,27,,,15,,N,billing@infotech.example,,"Baner, Pune 411045"
+Annapurna Caterers,Annapurna Caterers,supplier,27AAFCA2468B1ZZ,AAFCA2468B,27,,,7,,N,,,"Kothrud, Pune 411038"

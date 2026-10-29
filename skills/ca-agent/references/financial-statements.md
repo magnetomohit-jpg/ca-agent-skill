@@ -78,13 +78,13 @@ closing.
 **Trade payables:**
 - dues to micro and small enterprises separately, with the MSMED Act s.22 disclosures (principal and
   interest unpaid, interest paid u/s 16, interest due and payable)
-- **ageing schedule:** less than 1 year, 1-2 years, 2-3 years, more than 3 years, split into MSME / others /
+- **ageing schedule** (`parties.py report` produces it): less than 1 year, 1-2 years, 2-3 years, more than 3 years, split into MSME / others /
   disputed MSME / disputed others, counted from the due date of payment
 
 **Trade receivables:**
 - secured / unsecured considered good, significant increase in credit risk, credit impaired
 - debts due from directors and officers
-- **ageing schedule:** less than 6 months, 6 months-1 year, 1-2, 2-3, more than 3 years, split into
+- **ageing schedule** (`parties.py report` produces it): less than 6 months, 6 months-1 year, 1-2, 2-3, more than 3 years, split into
   undisputed / disputed and good / doubtful
 
 **PPE and intangibles:**

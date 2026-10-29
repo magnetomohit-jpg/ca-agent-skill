@@ -307,8 +307,8 @@ Debt service coverage ratio needs principal repayments - compute separately if t
 
 ## Checks before finalising
 
-- Reverse-charge GST payable at year end 1,08,900.00 - payable in cash with the March GSTR-3B (due 20 April); the input credit is available only after payment
-- TDS payable at year end 7,500.00 - deposit by 30 April; if deposited after the ITR due date, 30% of the expense is disallowed u/s 40(a)(ia) and interest u/s 201(1A) applies
+- Reverse-charge GST payable at year end 1,08,900.00 - payable in cash with the March GSTR-3B (due 20 Apr 2026); the input credit is available only after payment
+- TDS payable at year end 7,500.00 - deposit by 30 Apr 2026; if deposited after the ITR due date, 30% of the expense is disallowed u/s 40(a)(ia) and interest u/s 201(1A) applies
 
 Small company test (s.2(85)): paid-up capital 10,00,000.00 (limit 10,00,00,000), turnover 32,00,000.00 from aato_previous_fy (GST turnover) in company.json (limit 1,00,00,00,000): within both limits, so it is a small company unless it is a public company, a holding or subsidiary company, a s.8 company or governed by a special Act. A small company need not include the cash flow statement (s.2(40)); it is still shown here.
 

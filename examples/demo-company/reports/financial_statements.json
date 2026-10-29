@@ -247,8 +247,8 @@
     }
   ],
   "checks": [
-    "Reverse-charge GST payable at year end 1,08,900.00 - payable in cash with the March GSTR-3B (due 20 April); the input credit is available only after payment",
-    "TDS payable at year end 7,500.00 - deposit by 30 April; if deposited after the ITR due date, 30% of the expense is disallowed u/s 40(a)(ia) and interest u/s 201(1A) applies"
+    "Reverse-charge GST payable at year end 1,08,900.00 - payable in cash with the March GSTR-3B (due 20 Apr 2026); the input credit is available only after payment",
+    "TDS payable at year end 7,500.00 - deposit by 30 Apr 2026; if deposited after the ITR due date, 30% of the expense is disallowed u/s 40(a)(ia) and interest u/s 201(1A) applies"
   ],
   "notes": {
     "share_capital": [

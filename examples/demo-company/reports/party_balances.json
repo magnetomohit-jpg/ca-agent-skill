@@ -1,0 +1,94 @@
+{
+  "as_of": "2026-03-31",
+  "debtors": [
+    {
+      "party": "Patil Retail LLP",
+      "gstin": "27AAQFP4321C1ZD",
+      "credit_days": 60,
+      "balance": 598400.0,
+      "msme": false,
+      "disputed": false,
+      "items": [
+        {
+          "date": "2025-12-12",
+          "ref": "INV/25-26/007",
+          "amount": 598400.0,
+          "due": "2026-02-10",
+          "days_past_due": 49,
+          "opening": false,
+          "narration": "Sale to Patil Retail LLP"
+        }
+      ],
+      "oldest": "2025-12-12",
+      "days_outstanding": 109,
+      "max_days_past_due": 49,
+      "ageing": {
+        "Not due": 0.0,
+        "Less than 6 months": 598400.0,
+        "6 months - 1 year": 0.0,
+        "1-2 years": 0.0,
+        "2-3 years": 0.0,
+        "More than 3 years": 0.0
+      },
+      "overdue": 598400.0
+    }
+  ],
+  "creditors": [
+    {
+      "party": "Rathod Components Pvt Ltd",
+      "gstin": "24AAGCR9012M1Z6",
+      "credit_days": 45,
+      "balance": 354000.0,
+      "msme": true,
+      "disputed": false,
+      "items": [
+        {
+          "date": "2026-03-10",
+          "ref": "RC/240",
+          "amount": 354000.0,
+          "due": "2026-04-24",
+          "days_past_due": -24,
+          "opening": false,
+          "narration": "Power adapters from Rathod Components"
+        }
+      ],
+      "oldest": "2026-03-10",
+      "days_outstanding": 21,
+      "max_days_past_due": -24,
+      "ageing": {
+        "Not due": 354000.0,
+        "Less than 1 year": 0.0,
+        "1-2 years": 0.0,
+        "2-3 years": 0.0,
+        "More than 3 years": 0.0
+      },
+      "overdue": 0.0
+    }
+  ],
+  "advances_to_suppliers": [],
+  "advances_from_customers": [],
+  "schedule_iii_receivables": [
+    [
+      "Undisputed - considered good",
+      0.0,
+      598400.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      598400.0
+    ]
+  ],
+  "schedule_iii_payables": [
+    [
+      "MSME",
+      354000.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      354000.0
+    ]
+  ],
+  "checks": []
+}

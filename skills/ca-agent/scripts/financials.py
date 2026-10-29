@@ -72,9 +72,16 @@ def compute(books: Books, bal: dict) -> dict:
         if not acc:
             raise BooksError(f"Journal uses unknown account {name!r}; run books.py validate")
         line = acc["line"]
+        label = name
         if line == "cash_equivalents" and b < 0:
             line = "st_borrowings"
             notes.append(f"{name} has a credit (overdraft) balance and is shown under short-term borrowings")
+        elif line == "trade_receivables" and b < 0 and not (acc["tags"] & CONTRA_TAGS):
+            line, label = "other_current_liabilities", f"Advance from customer - {name}"
+            notes.append(f"{name} has a credit balance (advance received) and is shown under other current liabilities")
+        elif line in ("trade_payables_msme", "trade_payables_others") and b > 0:
+            line, label = "st_loans_advances", f"Advance to supplier - {name}"
+            notes.append(f"{name} has a debit balance (advance paid) and is shown under short-term loans and advances")
         nature = LINES[line][1]
         amt = b if nature in ("asset", "expense", "tax") else -b
         if amt < 0 and not (acc["tags"] & CONTRA_TAGS) and LINES[line][0] == "BS" and line not in (
@@ -82,7 +89,7 @@ def compute(books: Books, bal: dict) -> dict:
             warnings.append(f"{name} ({LINES[line][2]}) has an unusual {'credit' if nature == 'asset' else 'debit'} "
                             f"balance of {inr(abs(amt))} - reclassify (e.g. advance from customer / to supplier) or correct")
         lines[line] += amt
-        detail[line].append((name, amt))
+        detail[line].append((label, amt))
     net_dta = lines["deferred_tax_asset"] - lines["deferred_tax_liab"]
     lines["deferred_tax_asset"], lines["deferred_tax_liab"] = (net_dta, ZERO) if net_dta >= 0 else (ZERO, -net_dta)
     # Net DTA/DTL (AS 22 para 29). An account whose balance lands on the other side is labelled so the note

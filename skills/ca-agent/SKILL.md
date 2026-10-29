@@ -1,6 +1,6 @@
 ---
 name: ca-agent
-description: Indian Chartered Accountant (CA) agent for companies, LLPs, firms and individuals. Maintains double-entry books (vouchers, ledgers, trial balance, bank reconciliation, year-end close), prepares GST returns (GSTR-1, GSTR-3B with rule 88A ITC set-off, GSTR-2B reconciliation, GSTR-9 working, interest and late fee), computes income tax and prepares ITR data (ITR-6 for companies with 115BAA/normal/MAT, ITR-1 to ITR-5, old vs new regime, advance tax, TDS, interest u/s 234A/B/C), and drafts Schedule III balance sheet, profit and loss, cash flow, notes, ratios, depreciation (Companies Act and Income-tax) and statutory compliance calendars. Use this skill whenever the user mentions accounts or bookkeeping for an Indian business, journal entries, Tally, ledgers, trial balance, GST, GSTR, ITC, e-invoice, income tax, ITR, TDS, advance tax, balance sheet, P&L, final accounts, audit, ROC/MCA filings or due dates, or asks for help "like a CA" - even if they never name this skill.
+description: Indian Chartered Accountant (CA) agent for companies, LLPs, firms and individuals. Maintains double-entry books (vouchers, ledgers, trial balance, bank reconciliation, party master, debtors/creditors ageing, party-wise advances, balance confirmations, year-end close), prepares GST returns (GSTR-1, GSTR-3B with rule 88A ITC set-off, GSTR-2B reconciliation, GSTR-9 working, interest and late fee), computes income tax and prepares ITR data (ITR-6 for companies with 115BAA/normal/MAT, ITR-1 to ITR-5, old vs new regime, advance tax, TDS, interest u/s 234A/B/C), and drafts Schedule III balance sheet, profit and loss, cash flow, notes, ratios, depreciation (Companies Act and Income-tax) and statutory compliance calendars. Use this skill whenever the user mentions accounts or bookkeeping for an Indian business, journal entries, Tally, ledgers, trial balance, debtors, creditors, outstanding or overdue parties, advances, GST, GSTR, ITC, e-invoice, income tax, ITR, TDS, advance tax, balance sheet, P&L, final accounts, audit, ROC/MCA filings or due dates, or asks for help "like a CA" - even if they never name this skill.
 ---
 
 # CA Agent
@@ -66,6 +66,7 @@ Every entity and financial year gets one folder, the single source of truth that
 | `journal.csv` | every voucher line: date, voucher_no, voucher_type, account, debit, credit, narration, ref |
 | `sales_register.csv` / `purchase_register.csv` | invoice-line GST data (GSTIN, place of supply, HSN, rate, tax heads, RCM, ITC eligibility) |
 | `fixed_assets.csv` / `it_blocks.csv` | asset register and opening tax WDV per block |
+| `parties.csv` | party master: one row per customer/supplier ledger with GSTIN, PAN, state, MSME category and Udyam number, credit days, TDS section, disputed flag, contacts |
 
 Scripts live in `scripts/` next to this file; run them as `python <skill-dir>/scripts/<name>.py`.
 Each prints a markdown report. `--json` gives machine-readable output, and `--out-dir DIR` saves
@@ -83,6 +84,7 @@ so there is no need to read the source. On Windows, give Python native paths (`F
 | Post vouchers | `books.py post <dir> --file vouchers.json` (`--dry-run` first for big batches) |
 | Check / view books | `books.py validate`, `tb`, `ledger --account`, `daybook` |
 | Bank reconciliation | `bank_reco.py <dir> --account "HDFC Bank" --statement stmt.csv --suggest entries.json` |
+| Debtors, creditors, advances | `parties.py sync <dir>` (fill the master), `parties.py report <dir> [--as-of] --out-dir <dir>/reports` (sheets with Schedule III ageing, xlsx), `parties.py confirm <dir> --out-dir <dir>/reports/confirmations` (balance-confirmation letters) |
 | GST | `gst.py check`, `gstr1`, `reco --gstr2b 2b.csv`, `gstr3b`, `annual` with `--period 2025-04` / `2025-26:Q1` |
 | Depreciation | `depreciation.py <dir> --voucher dep.json --write-next --out-dir <dir>/working` |
 | Company tax | `income_tax.py company-draft <dir> --depreciation-json ... --out tax_input.json`, then `income_tax.py company tax_input.json` |
@@ -103,7 +105,12 @@ accounts, dates outside the year and negative cash. Nothing downstream is reliab
    account per customer, supplier and bank account (`add-account`), so ledgers and ageing are usable.
    Put MSME suppliers on `trade_payables_msme` with tag `msme`: the Schedule III split and the
    sec 43B(h) disallowance both depend on it. Tally users: map Tally groups with the table in
-   `references/bookkeeping.md`.
+   `references/bookkeeping.md`. Then run `parties.py sync` and fill `parties.csv` (credit days, PAN,
+   Udyam number, contacts): ageing, overdue days, the 45-day MSME check and the confirmation letters
+   all read it. Book an advance in the party's own account (Dr supplier / Cr customer) rather than in a
+   general advances account: the reports then show it party-wise, set it off against that party's later
+   bills, and the balance sheet moves a wrong-side balance to loans and advances or other current
+   liabilities automatically.
 3. **Opening balances.** Post one `Opening` voucher dated 1 April from last year's audited balance
    sheet. It may contain only balance-sheet accounts: last year's profit is already inside
    "Surplus in Statement of Profit and Loss".
@@ -119,7 +126,7 @@ accounts, dates outside the year and negative cash. Nothing downstream is reliab
    Suspense Account and keep a list for the user rather than guessing. `financials.py` refuses to sign
    off while Suspense has a balance.
 6. **Monthly:** bank reconciliation for every bank account, GST returns, TDS deposit by the 7th, and
-   a quick `tb` review for odd balances (credit balances in debtors, debit balances in creditors).
+   `parties.py report` for overdue debtors, MSME bills nearing 45 days and advances not yet adjusted.
 
 ## Workflow 2 - GST returns
 
@@ -151,8 +158,9 @@ Work through this checklist in order, because each step changes figures used by 
 balance already shows Depreciation, Deferred Tax and Current Tax, the books have been closed: treat the
 list as a review. Rerun each script to verify the posted figure, and post only corrections.
 
-1. Bank reconciliation for every account as at 31 March. Confirm debtor and creditor balances, and
-   clear Suspense.
+1. Bank reconciliation for every account as at 31 March. Run `parties.py report` and `parties.py confirm`
+   (balance-confirmation letters for the user to send), chase old debtors and stale advances, and clear
+   Suspense. The report's Schedule III ageing tables go straight into the receivables and payables notes.
 2. Reconcile GST ledgers with the returns (`gst.py annual`) and TDS payable with the 24Q/26Q returns.
 3. Depreciation: run `depreciation.py --voucher ... --write-next` and post the voucher. Disposals need
    their own entry. The same run gives tax depreciation and the book-tax timing difference.
@@ -175,7 +183,8 @@ list as a review. Rerun each script to verify the posted figure, and post only c
      public, a holding or subsidiary company or a s.8 company, so confirm those before omitting the
      statement, and say which way you went.
 8. Complete the disclosures the script cannot know about: share capital details and promoter
-   shareholding, ageing of receivables, payables and CWIP, related parties (AS 18), contingent liabilities,
+   shareholding, CWIP ageing (receivables and payables ageing come from `parties.py`; mark any
+   credit-impaired or disputed amounts), related parties (AS 18), contingent liabilities,
    MSME dues, CSR, and the Schedule III additional regulatory information. See
    `references/financial-statements.md`.
 9. After board approval and audit, run `books.py close-year <dir> <next-year-dir>` to carry balances forward.

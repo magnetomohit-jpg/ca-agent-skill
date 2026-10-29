@@ -17,6 +17,9 @@ A Claude skill that works like an Indian CA's assistant for companies, LLPs, fir
   - Schedule III (Division I) balance sheet, P&L, cash flow (AS 3) and account-level notes
   - Schedule III ratios with >25% variance flags
   - Excel export and pre-closing checks
+- **Party records:** party master (GSTIN, PAN, MSME/Udyam, credit days), debtors and creditors sheets with
+  overdue days and Schedule III ageing, party-wise advances (shown under advances in the balance sheet),
+  and balance-confirmation letters.
 - **Depreciation:** Companies Act Schedule II (WDV/SLM) and Income-tax block WDV (half rate under 180 days),
   plus the deferred tax timing difference.
 - **Compliance calendar:** GST, TDS, advance tax, ITR, tax audit, ROC (AOC-4, MGT-7, DPT-3, MSME-1,
@@ -89,7 +92,7 @@ Then ask Claude things like:
 skills/ca-agent/
   SKILL.md                 workflows and ground rules Claude follows
   references/              bookkeeping, GST, income tax, Schedule III, compliance notes
-  scripts/                 books.py, gst.py, income_tax.py, financials.py, depreciation.py,
+  scripts/                 books.py, parties.py, gst.py, income_tax.py, financials.py, depreciation.py,
                            bank_reco.py, compliance.py, rules.py (all rates), common.py
   assets/                  default chart of accounts mapped to Schedule III, register templates
 examples/                  demo source data, statement/GSTR-2B inputs, build_demo.py, built demo books

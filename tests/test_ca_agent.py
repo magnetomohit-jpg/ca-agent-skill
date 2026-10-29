@@ -151,6 +151,51 @@ class DemoCompany(unittest.TestCase):
         out = run("books.py", "tb", nxt)
         self.assertIn("Tallied.", out)
         self.assertTrue((nxt / "fixed_assets.csv").read_text().count("FA-00") == 3)
+        self.assertTrue((nxt / "parties.csv").exists())  # party master carries forward
+
+    def test_party_sheets(self):
+        p = run_json("parties.py", "report", self.books)
+        self.assertEqual([(d["party"], d["balance"]) for d in p["debtors"]], [("Patil Retail LLP", 598400.0)])
+        patil = p["debtors"][0]
+        self.assertEqual(patil["max_days_past_due"], 49)      # bill 12-12-2025 + 60 credit days -> due 10-02-2026
+        self.assertEqual(patil["ageing"]["Less than 6 months"], 598400.0)
+        rathod = p["creditors"][0]
+        self.assertTrue(rathod["msme"])
+        self.assertEqual(rathod["ageing"]["Not due"], 354000.0)  # 21 days old, 45 credit days
+        self.assertEqual(p["checks"], [])
+        self.assertEqual(p["schedule_iii_payables"][0][0], "MSME")
+
+    def test_confirmation_letters(self):
+        out = Path(self.tmp.name) / "letters"
+        run("parties.py", "confirm", self.books, "--out-dir", out)
+        letters = sorted(f.name for f in out.glob("*.md"))
+        self.assertEqual(letters, ["Patil_Retail_LLP.md", "Rathod_Components_Pvt_Ltd.md"])
+        self.assertIn("5,98,400.00", (out / "Patil_Retail_LLP.md").read_text(encoding="utf-8"))
+
+    def test_party_advances_reclassified(self):
+        import shutil
+        books = Path(self.tmp.name) / "adv"
+        shutil.copytree(self.books, books)
+        run("books.py", "add-account", books, "--account", "Deccan Retail Pvt Ltd", "--line", "trade_receivables",
+            "--tag", "debtor")
+        vouchers = Path(self.tmp.name) / "adv.json"
+        vouchers.write_text(json.dumps([
+            {"date": "2026-02-10", "type": "Payment", "ref": "ADV-MP-1", "narration": "Advance to Mehta Packaging",
+             "lines": [{"account": "Mehta Packaging", "dr": 40000}, {"account": "HDFC Bank Current A/c", "cr": 40000}]},
+            {"date": "2026-03-20", "type": "Receipt", "ref": "ADV-DR-1", "narration": "Advance from Deccan Retail",
+             "lines": [{"account": "HDFC Bank Current A/c", "dr": 75000}, {"account": "Deccan Retail Pvt Ltd", "cr": 75000}]},
+        ]), encoding="utf-8")
+        run("books.py", "post", books, "--file", vouchers)
+        fs = run_json("financials.py", books)
+        self.assertEqual(fs["total_assets"], fs["total_equity_liabilities"])
+        self.assertIn(["Advance to supplier - Mehta Packaging", 40000.0], fs["notes"]["st_loans_advances"])
+        self.assertIn(["Advance from customer - Deccan Retail Pvt Ltd", 75000.0], fs["notes"]["other_current_liabilities"])
+        self.assertFalse(any("unusual" in c for c in fs["checks"]))
+        p = run_json("parties.py", "report", books)
+        self.assertEqual([(a["party"], a["balance"]) for a in p["advances_to_suppliers"]], [("Mehta Packaging", 40000.0)])
+        self.assertEqual([(a["party"], a["balance"]) for a in p["advances_from_customers"]],
+                         [("Deccan Retail Pvt Ltd", 75000.0)])
+        self.assertTrue(any("Deccan Retail" in c and "parties.csv" in c for c in p["checks"]))
 
 
 class Individuals(unittest.TestCase):

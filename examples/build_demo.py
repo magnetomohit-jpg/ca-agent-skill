@@ -63,7 +63,7 @@ def build(dest: Path) -> dict:
     (dest / "company.json").write_text(json.dumps(company, indent=2) + "\n", encoding="utf-8")
     for name, line, tag in PARTIES:
         run("books.py", "add-account", dest, "--account", name, "--line", line, "--tag", tag, cwd=dest)
-    for f in ("sales_register.csv", "purchase_register.csv", "fixed_assets.csv", "it_blocks.csv"):
+    for f in ("sales_register.csv", "purchase_register.csv", "fixed_assets.csv", "it_blocks.csv", "parties.csv"):
         shutil.copy(SOURCE / f, dest / f)
     run("books.py", "post", dest, "--file", SOURCE / "vouchers.json", cwd=dest)
 
@@ -111,6 +111,8 @@ def build(dest: Path) -> dict:
     run("bank_reco.py", dest, "--account", "HDFC Bank Current A/c", "--statement", HERE / "inputs" / "hdfc_statement_apr2025.csv",
         "--as-of", "2025-04-30", "--suggest", work / "bank_entries_apr2025.json", "--out-dir", reports, cwd=dest)
     run("compliance.py", dest, "--fy", "2025-26", "--ics", reports / "compliance_fy2025-26.ics", "--out-dir", reports, cwd=dest)
+    run("parties.py", "report", dest, "--out-dir", reports, cwd=dest)
+    run("parties.py", "confirm", dest, "--out-dir", reports / "confirmations", cwd=dest)
     return {"tax": comp, "depreciation": dep}
 
 

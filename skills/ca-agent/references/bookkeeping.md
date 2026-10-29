@@ -1,7 +1,7 @@
 # Bookkeeping reference
 
 Contents: 1. Voucher JSON · 2. Entry patterns · 3. Schedule III lines and tags · 4. Tally mapping ·
-5. Importing data · 6. Month-end and year-end routines
+5. Importing data · 6. Party records · 7. Month-end and year-end routines
 
 ## 1. Voucher JSON (input to `books.py post`)
 
@@ -30,6 +30,8 @@ CGST + SGST pair for intra-state transactions, or IGST for inter-state ones.
 | Sale of goods/services | Sales | Dr Customer (invoice value) · Cr Sales · Cr Output GST |
 | Export under LUT / SEZ without payment | Sales | Dr Customer · Cr Export Sales (no GST; register supply_type EXPWOP/SEZWOP) |
 | Export with IGST (refund route) | Sales | Dr Customer · Cr Export Sales · Cr Output IGST |
+| Advance paid to a supplier | Payment | Dr Supplier (own ledger) · Cr Bank - the debit balance is shown as an advance until bills arrive; GST on advances applies only to services (pay on receipt, adjust on invoice) |
+| Advance received from a customer | Receipt | Dr Bank · Cr Customer (own ledger) - shown under other current liabilities until invoiced; for services, pay GST on the advance (GSTR-1 table 11) |
 | Sales return / discount by credit note | Credit Note | Dr Sales · Dr Output GST · Cr Customer |
 | Purchase with eligible ITC | Purchase | Dr Purchases / expense / asset · Dr Input GST · Cr Supplier |
 | Purchase with blocked ITC (s.17(5)) | Purchase | Dr expense or asset **including** GST · Cr Supplier (register itc = blocked) |
@@ -142,7 +144,14 @@ taxable value, rate and tax heads. Write one register line per HSN/rate and one 
 Check the GSTIN checksum (`gst.py check`) and the tax maths. Supplier invoices are a frequent source
 of rate errors.
 
-## 6. Routines
+## 6. Party records (`parties.py`)
+
+- `parties.csv` is the party master. `parties.py sync` adds a row for every customer and supplier ledger (GSTIN, PAN and state from the registers, MSME from the tag); fill in credit days, Udyam number, TDS section, disputed flag and contacts.
+- `parties.py report` gives the debtors, creditors and advances sheets: balance, amount not yet due and past due (bill date + credit days), oldest open bill, Schedule III ageing tables, and checks (invalid GSTIN/PAN, MSME without Udyam, MSME bills over 45 days, debtors overdue more than a year, advances older than a year, ledgers without a master row). `--out-dir` adds an xlsx with an open-bills sheet.
+- Open bills are matched first-in-first-out (payments clear the oldest bills). If a customer pays against specific bills out of order, the age shown is the FIFO age; note it where it matters.
+- `parties.py confirm` writes one balance-confirmation letter per party with its open items, plus `confirmations_index.csv` with emails. The user sends them; replies go to the auditor's file.
+
+## 7. Routines
 
 **Monthly:** post all vouchers → `books.py validate` → bank reconciliation for each account → `gst.py check`,
 `gstr1`, `reco`, `gstr3b` → post the set-off/payment → deposit TDS by the 7th → review `tb` for

@@ -72,7 +72,7 @@ def cmd_init(args):
         shutil.copy(SKILL_DIR / "assets" / "chart_of_accounts.csv", folder / "chart_of_accounts.csv")
     if not (folder / "journal.csv").exists():
         write_rows(folder / "journal.csv", JOURNAL_HEADERS, [])
-    for tpl in ("sales_register.csv", "purchase_register.csv", "fixed_assets.csv"):
+    for tpl in ("sales_register.csv", "purchase_register.csv", "fixed_assets.csv", "parties.csv"):
         if not (folder / tpl).exists():
             shutil.copy(TEMPLATES / tpl, folder / tpl)
     print(f"Created books for {args.name} FY {args.fy} in {folder}")
@@ -363,6 +363,8 @@ def cmd_close_year(args):
     company["books_start"] = new_start.isoformat()
     dump_json(company, dest / "company.json")
     shutil.copy(books.dir / "chart_of_accounts.csv", dest / "chart_of_accounts.csv")
+    if (books.dir / "parties.csv").exists():  # the party master carries over unchanged
+        shutil.copy(books.dir / "parties.csv", dest / "parties.csv")
     rows = []
     for name, bal in sorted(merged.items()):
         if bal == 0:
